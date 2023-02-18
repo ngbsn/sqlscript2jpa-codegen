@@ -1,2 +1,2 @@
-# sql-script-jpa-codegen
-JPA code generator from SQL script
+# sqlscript2jpa-codegen
+SQL Schema Script File to JPA Code Generator Maven Plugin
