@@ -1,32 +1,15 @@
 package org.greenfall.schema.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
 public class ForeignKey {
 
-    private String column;
+    private List<String> columns;
     private String referenceTable;
-    private String referenceColumn;
-
-    public String getColumn() {
-        return column;
-    }
-
-    public void setColumn(String column) {
-        this.column = column;
-    }
-
-    public String getReferenceTable() {
-        return referenceTable;
-    }
-
-    public void setReferenceTable(String referenceTable) {
-        this.referenceTable = referenceTable;
-    }
-
-    public String getReferenceColumn() {
-        return referenceColumn;
-    }
-
-    public void setReferenceColumn(String referenceColumn) {
-        this.referenceColumn = referenceColumn;
-    }
+    private List<String> refColumns;
 }
