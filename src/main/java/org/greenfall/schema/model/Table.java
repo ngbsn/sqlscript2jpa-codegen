@@ -13,6 +13,4 @@ public class Table {
 
     private String name;
     private List<Column> columns = new ArrayList<>();
-    private PrimaryKey primaryKey;
-    private List<ForeignKey> foreignKeys = new ArrayList<>();
 }

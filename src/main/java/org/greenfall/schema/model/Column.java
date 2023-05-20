@@ -10,7 +10,9 @@ import java.util.List;
 public class Column {
 
     private String name;
-    private String dataType;
+    private String type;
     private boolean unique;
     private boolean nullable;
+    private boolean primaryKey;
+    private boolean foreignKey;
 }

@@ -14,7 +14,8 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <maven-plugin-tools.version>3.7.1</maven-plugin-tools.version>
+        <maven.version>3.9.1</maven.version>
+        <maven.plugin.tools.version>3.8.2</maven.plugin.tools.version>
     </properties>
 
     <dependencies>
@@ -24,13 +25,27 @@
             <version>3.0</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- dependencies to annotations -->
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
-            <version>${maven-plugin-tools.version}</version>
+            <version>${maven.plugin.tools.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+            <version>${maven.version}</version>
         </dependency>
 
         <!-- jsql parser -->
@@ -40,13 +55,18 @@
             <version>4.5</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.10.0</version>
+        </dependency>
 
+        <!-- template engine-->
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
@@ -59,6 +79,8 @@
             <artifactId>logback-classic</artifactId>
             <version>1.4.7</version>
         </dependency>
+
+        <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -66,6 +88,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
@@ -75,7 +104,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>${maven-plugin-tools.version}</version>
+                    <version>3.7.1</version>
                     <executions>
                         <execution>
                             <id>help-mojo</id>
