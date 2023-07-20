@@ -1,4 +1,4 @@
-package org.greenfall.schema.parser;
+package org.ngbsn.schema.parser;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -7,8 +7,8 @@ import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.create.table.ForeignKeyIndex;
 import net.sf.jsqlparser.statement.create.table.Index;
-import org.greenfall.schema.model.Column;
-import org.greenfall.schema.model.Table;
+import org.ngbsn.schema.model.Column;
+import org.ngbsn.schema.model.Table;
 
 import java.util.ArrayList;
 import java.util.List;

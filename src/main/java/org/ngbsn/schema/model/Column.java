@@ -1,9 +1,7 @@
-package org.greenfall.schema.model;
+package org.ngbsn.schema.model;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Setter
 @Getter

@@ -1,4 +1,4 @@
-package org.greenfall.maven;
+package org.ngbsn.maven;
 
 import lombok.SneakyThrows;
 import org.apache.maven.plugin.AbstractMojo;
@@ -7,7 +7,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import static org.greenfall.generator.JPACodeGenerator.generateCode;
+import static org.ngbsn.generator.JPACodeGenerator.generateCode;
 
 @Mojo(name = "parseSchema")
 public class JPACodeGenMojo extends AbstractMojo {

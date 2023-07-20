@@ -1,18 +1,18 @@
-package org.greenfall.generator;
+package org.ngbsn.generator;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import org.greenfall.schema.model.Table;
-import org.greenfall.schema.parser.SQLParser;
+import org.ngbsn.schema.model.Table;
+import org.ngbsn.schema.parser.SQLParser;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.greenfall.util.CommonUtils.tableNameToEntityClassName;
+import static org.ngbsn.util.CommonUtils.tableNameToEntityClassName;
 
 public class JPACodeGenerator {
 
@@ -45,7 +45,7 @@ public class JPACodeGenerator {
             /* Create a data-model */
             Map<String, Object> root = new HashMap<>();
             root.put("table", table);
-            root.put("package", "com.greenfall");
+            root.put("package", "com.ngbsn");
             List<String> imports = new ArrayList<>();
             imports.add("java.util.*");
             root.put("imports", imports);

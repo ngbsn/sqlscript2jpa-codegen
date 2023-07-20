@@ -1,4 +1,4 @@
-package org.greenfall.util;
+package org.ngbsn.util;
 
 import org.apache.commons.text.WordUtils;
 

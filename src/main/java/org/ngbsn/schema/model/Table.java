@@ -1,4 +1,4 @@
-package org.greenfall.schema.model;
+package org.ngbsn.schema.model;
 
 import lombok.Getter;
 import lombok.Setter;

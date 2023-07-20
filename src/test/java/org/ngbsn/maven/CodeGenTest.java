@@ -1,17 +1,15 @@
-package org.greenfall.maven;
+package org.ngbsn.maven;
 
 import freemarker.template.TemplateException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import static org.greenfall.generator.JPACodeGenerator.generateCode;
+import static org.ngbsn.generator.JPACodeGenerator.generateCode;
 
 public class CodeGenTest {
 
