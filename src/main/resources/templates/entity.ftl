@@ -11,18 +11,17 @@ ${annotation}
 @Table(name = "${table.name}")
 public class ${className}{
 
+
 <#list table.columns as column>
 <#if column.primaryKey>
   @Id
 </#if>
 
-<#if column.nullable>
-@Nullable
-<#else>
-@Nonnull
+<#if column.nullable == false>
+@NotNull
 </#if>
 
   @Column
-  private ${column.type} ${column.name};
+  private String ${column.name};
 </#list>
 }

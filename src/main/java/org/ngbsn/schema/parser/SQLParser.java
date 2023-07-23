@@ -1,7 +1,6 @@
 package org.ngbsn.schema.parser;
 
 
-import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
@@ -9,14 +8,16 @@ import net.sf.jsqlparser.statement.create.table.ForeignKeyIndex;
 import net.sf.jsqlparser.statement.create.table.Index;
 import org.ngbsn.schema.model.Column;
 import org.ngbsn.schema.model.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 public class SQLParser {
+    private static final Logger logger = LoggerFactory.getLogger(SQLParser.class);
 
     public static List<Table> parse(final String sqlScript) {
         try {
@@ -64,7 +65,7 @@ public class SQLParser {
 
             return tables;
         } catch (Exception e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
         return null;
     }
