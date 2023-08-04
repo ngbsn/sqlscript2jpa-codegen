@@ -11,11 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.file.Path;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.ngbsn.util.CommonUtils.packageNameToFolderStructure;
 import static org.ngbsn.util.CommonUtils.tableNameToEntityClassName;
 
 public class JPACodeGenerator {
@@ -73,7 +74,9 @@ public class JPACodeGenerator {
             root.put("className", className);
 
             /* Merge data-model with template */
-            OutputStream outputStream = new FileOutputStream("target/generated-sources/" + className + ".java");
+            String dir = "target/generated-sources/sqlscript2jpa/src/main/java/" + packageNameToFolderStructure(packageName);
+            Files.createDirectories(Paths.get(dir));
+            OutputStream outputStream = new FileOutputStream(dir + className + ".java");
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
             template.process(root, outputStreamWriter);
             outputStreamWriter.close();
