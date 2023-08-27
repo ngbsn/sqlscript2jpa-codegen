@@ -1,23 +1,23 @@
-package org.ngbsn.schema.parser;
+package org.ngbsn.generator;
 
 
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
-import net.sf.jsqlparser.statement.create.table.ForeignKeyIndex;
 import net.sf.jsqlparser.statement.create.table.Index;
-import org.ngbsn.schema.model.Column;
-import org.ngbsn.schema.model.Table;
+import org.apache.commons.text.CaseUtils;
+import org.ngbsn.model.Column;
+import org.ngbsn.model.Table;
+import org.ngbsn.util.SQLToJavaMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
-public class SQLParser {
-    private static final Logger logger = LoggerFactory.getLogger(SQLParser.class);
+public class ModelGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(ModelGenerator.class);
 
     public static List<Table> parse(final String sqlScript) {
         try {
@@ -28,12 +28,14 @@ public class SQLParser {
                     Table table = new Table();
                     tables.add(table);
                     table.setName(parsedTable.getTable().getName());
+                    table.setClassName(CaseUtils.toCamelCase(table.getName(), true, '_'));
                     List<Column> columns = new ArrayList<>();
                     parsedTable.getColumnDefinitions().forEach(columnDefinition -> {
                         Column column = new Column();
                         columns.add(column);
                         column.setName(columnDefinition.getColumnName());
-                        column.setType(columnDefinition.getColDataType().getDataType());
+                        column.setFieldName(CaseUtils.toCamelCase(column.getName(), false, '_'));
+                        column.setType(SQLToJavaMapping.sqlToJavaMap.get(columnDefinition.getColDataType().getDataType()));
                         column.setNullable(true);
                         if (columnDefinition.getColumnSpecs() != null) {
                             String constraints = String.join(" ", columnDefinition.getColumnSpecs());
@@ -46,20 +48,16 @@ public class SQLParser {
                         }
                     });
                     table.setColumns(columns);
-                    Set<String> parsedColumnsWithPrimaryKeyIndex = parsedTable.getIndexes().stream().filter(index -> index.getType().equals("PRIMARY KEY")).map(Index::getName).collect(Collectors.toSet());
-                    Set<String> parsedColumnsWithForeignKeyIndex = parsedTable.getIndexes().stream().filter(index -> index instanceof ForeignKeyIndex).map(Index::getName).collect(Collectors.toSet());
-
-                    table.getColumns().forEach(column -> {
-                        if (parsedColumnsWithPrimaryKeyIndex.contains(column.getName())) {
-                            column.setPrimaryKey(true);
+                    Optional<Index> optionalIndex = parsedTable.getIndexes().stream().filter(index -> index.getType().equals("PRIMARY KEY")).findFirst();
+                    List<Index.ColumnParams> columnParamsList;
+                    columnParamsList = optionalIndex.map(Index::getColumns).orElse(null);
+                    if(columnParamsList != null){
+                        if(columnParamsList.size() > 1){
+                            table.setNumOfPrimaryKeyColumns(columnParamsList.size());
                         }
-                    });
-                    table.getColumns().forEach(column -> {
-                        if (parsedColumnsWithForeignKeyIndex.contains(column.getName())) {
-                            column.setForeignKey(true);
-                        }
-                    });
-
+                        List<Column> primaryKeyColumns = table.getColumns().stream().filter(column -> columnParamsList.stream().anyMatch(columnParams -> columnParams.getColumnName().equals(column.getName()))).toList();
+                        primaryKeyColumns.forEach(column -> column.setPrimaryKey(true));
+                    }
                 }
             });
 

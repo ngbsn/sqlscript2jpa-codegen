@@ -5,8 +5,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import org.ngbsn.schema.model.Table;
-import org.ngbsn.schema.parser.SQLParser;
+import org.ngbsn.model.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +15,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.ngbsn.util.CommonUtils.packageNameToFolderStructure;
-import static org.ngbsn.util.CommonUtils.tableNameToEntityClassName;
+import static org.ngbsn.util.Util.packageNameToFolderStructure;
 
 public class JPACodeGenerator {
     private static final Logger logger = LoggerFactory.getLogger(JPACodeGenerator.class);
@@ -29,7 +27,7 @@ public class JPACodeGenerator {
     }
 
     private static List<Table> generateModels(final String sqlScript) {
-        return SQLParser.parse(sqlScript);
+        return ModelGenerator.parse(sqlScript);
     }
 
     private static void processTemplate(final List<Table> tables, final String packageName) throws IOException, TemplateException {
@@ -64,19 +62,18 @@ public class JPACodeGenerator {
             imports.add("java.util.*");
             imports.add("jakarta.persistence.*");
             imports.add("javax.validation.constraints.NotNull");
+            imports.add("java.io.Serializable");
             root.put("imports", imports);
 
             List<String> classAnnotations = new ArrayList<>();
             classAnnotations.add("@Entity");
             root.put("classAnnotations", classAnnotations);
 
-            String className = tableNameToEntityClassName(table.getName());
-            root.put("className", className);
 
             /* Merge data-model with template */
             String dir = "target/generated-sources/sqlscript2jpa/src/main/java/" + packageNameToFolderStructure(packageName);
             Files.createDirectories(Paths.get(dir));
-            OutputStream outputStream = new FileOutputStream(dir + className + ".java");
+            OutputStream outputStream = new FileOutputStream(dir + table.getClassName() + ".java");
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
             template.process(root, outputStreamWriter);
             outputStreamWriter.close();
