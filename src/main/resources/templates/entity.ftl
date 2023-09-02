@@ -4,13 +4,14 @@ package ${package};
 import ${import};
 </#list>
 
-<#list classAnnotations as annotation>
-${annotation}
-</#list>
+@Entity
 @Table(name = "${table.name}")
+<#if (table.numOfPrimaryKeyColumns > 1) >
+@IdClass(${table.className}.${table.className}PK.class)
+</#if>
 public class ${table.className}{
 <#if (table.numOfPrimaryKeyColumns > 1) >
-    class ${table.className}PK implements Serializable{
+    static class ${table.className}PK implements Serializable{
         <#list table.columns as column>
         <#if column.primaryKey == true>
             private ${column.type} ${column.fieldName};

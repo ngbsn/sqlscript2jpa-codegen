@@ -65,11 +65,6 @@ public class JPACodeGenerator {
             imports.add("java.io.Serializable");
             root.put("imports", imports);
 
-            List<String> classAnnotations = new ArrayList<>();
-            classAnnotations.add("@Entity");
-            root.put("classAnnotations", classAnnotations);
-
-
             /* Merge data-model with template */
             String dir = "target/generated-sources/sqlscript2jpa/src/main/java/" + packageNameToFolderStructure(packageName);
             Files.createDirectories(Paths.get(dir));
