@@ -10,11 +10,11 @@ public class SQLToJavaMapping {
     static {
         sqlToJavaMap.put("CHAR", "String");
         sqlToJavaMap.put("VARCHAR", "String");
-        sqlToJavaMap.put("LONGVARCHAR",	"String");
-        sqlToJavaMap.put("NUMERIC",	"java.math.BigDecimal");
-        sqlToJavaMap.put("DECIMAL",	"java.math.BigDecimal");
-        sqlToJavaMap.put("BIT",	"boolean");
-        sqlToJavaMap.put("TINYINT",	"byte");
+        sqlToJavaMap.put("LONGVARCHAR", "String");
+        sqlToJavaMap.put("NUMERIC", "java.math.BigDecimal");
+        sqlToJavaMap.put("DECIMAL", "java.math.BigDecimal");
+        sqlToJavaMap.put("BIT", "boolean");
+        sqlToJavaMap.put("TINYINT", "byte");
         sqlToJavaMap.put("SMALLINT", "short");
         sqlToJavaMap.put("INTEGER", "int");
         sqlToJavaMap.put("INT", "int");
@@ -22,7 +22,7 @@ public class SQLToJavaMapping {
         sqlToJavaMap.put("REAL", "float");
         sqlToJavaMap.put("FLOAT", "double");
         sqlToJavaMap.put("DOUBLE", "double");
-        sqlToJavaMap.put("BINARY",	"byte[]");
+        sqlToJavaMap.put("BINARY", "byte[]");
         sqlToJavaMap.put("VARBINARY", "byte[]");
         sqlToJavaMap.put("LONGVARBINARY", "byte[]");
         sqlToJavaMap.put("DATE", "java.sql.Date");

@@ -15,6 +15,7 @@ import static org.ngbsn.generator.JPACodeGenerator.generateCode;
 
 public class CodeGenTest {
     private static final Logger logger = LoggerFactory.getLogger(CodeGenTest.class);
+
     @Test
     public void testCodeGen() throws TemplateException, IOException {
         logger.info("Starting test");

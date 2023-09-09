@@ -4,13 +4,10 @@ import lombok.Builder;
 import org.ngbsn.model.annotations.Annotation;
 
 @Builder
-public class ManyToManyAnnotation implements Annotation {
-
-    private String mappedBy;
+public class GeneratedValueAnnotation implements Annotation {
 
     @Override
     public String toString() {
-
-        return mappedBy == null ? "@ManyToMany" : "@ManyToMany(mappedBy = \"" + mappedBy + "\")";
+        return "@GeneratedValue(strategy = GenerationType.IDENTITY)";
     }
 }

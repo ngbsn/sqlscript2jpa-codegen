@@ -14,5 +14,8 @@ public class Table {
     private String name;
     private String className;
     private List<Column> columns = new ArrayList<>();
+    private List<String> annotations = new ArrayList<>();
     private int numOfPrimaryKeyColumns;
+    private List<ForeignKeyConstraint> foreignKeyConstraints = new ArrayList<>();
+
 }

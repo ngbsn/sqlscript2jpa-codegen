@@ -1,10 +1,14 @@
 package org.ngbsn.model.annotations.entityAnnotations;
 
+import lombok.Builder;
 import org.ngbsn.model.annotations.Annotation;
 
-import java.util.Set;
-
+@Builder
 public class TableAnnotation implements Annotation {
     private String tableName;
-    private Set<UniqueConstraintAnnotation> uniqueConstraints;
+
+    @Override
+    public String toString() {
+        return "@Table(name = \"" + tableName + "\")";
+    }
 }

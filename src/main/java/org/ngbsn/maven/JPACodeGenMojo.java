@@ -1,7 +1,6 @@
 package org.ngbsn.maven;
 
 import lombok.SneakyThrows;
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -11,11 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.ngbsn.generator.JPACodeGenerator.generateCode;
@@ -27,13 +24,13 @@ public class JPACodeGenMojo extends AbstractMojo {
     /**
      * The path to Schema file.
      */
-    @Parameter( property = "sqlFilePath")
+    @Parameter(property = "sqlFilePath")
     private String sqlFilePath;
 
     /**
      * The package name for generated code
      */
-    @Parameter( property = "packageName")
+    @Parameter(property = "packageName")
     private String packageName;
 
     @SneakyThrows

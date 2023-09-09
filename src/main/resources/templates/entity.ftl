@@ -4,8 +4,9 @@ package ${package};
 import ${import};
 </#list>
 
-@Entity
-@Table(name = "${table.name}")
+<#list table.annotations as annotation>
+${annotation}
+</#list>
 <#if (table.numOfPrimaryKeyColumns > 1) >
 @IdClass(${table.className}.${table.className}PK.class)
 </#if>
@@ -24,10 +25,9 @@ public class ${table.className}{
 <#if column.primaryKey == true>
     @Id
 </#if>
-<#if column.nullable == false>
-    @NotNull
-</#if>
-    @Column(name = "${column.name}")
+<#list column.annotations as annotation>
+    ${annotation}
+</#list>
     private ${column.type} ${column.fieldName};
 </#list>
 }
