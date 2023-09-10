@@ -7,6 +7,7 @@ import net.sf.jsqlparser.statement.create.table.ForeignKeyIndex;
 import net.sf.jsqlparser.statement.create.table.Index;
 import org.apache.commons.text.CaseUtils;
 import org.ngbsn.model.Column;
+import org.ngbsn.model.EmbeddableClass;
 import org.ngbsn.model.ForeignKeyConstraint;
 import org.ngbsn.model.Table;
 import org.ngbsn.model.annotations.entityAnnotations.EntityAnnotation;
@@ -99,6 +100,12 @@ public class ModelGenerator {
         if (columnParamsList != null) {
             if (columnParamsList.size() > 1) {
                 table.setNumOfPrimaryKeyColumns(columnParamsList.size());
+                EmbeddableClass embeddableClass = EmbeddableClass
+                        .builder()
+                        .className(table.getClassName() + "PK")
+                        .fieldName(CaseUtils.toCamelCase(table.getName(), false, '_') + "PK")
+                        .build();
+                table.setEmbeddableClass(embeddableClass);
             }
             List<Column> primaryKeyColumns = table.getColumns().stream().
                     filter(column -> columnParamsList.stream().anyMatch(columnParams -> columnParams.getColumnName().equals(column.getName()))).toList();

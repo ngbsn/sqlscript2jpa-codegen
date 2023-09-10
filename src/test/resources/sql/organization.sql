@@ -51,7 +51,7 @@ CREATE TABLE organization.titles (
     from_date   DATE            NOT NULL,
     to_date     DATE,
     FOREIGN KEY (emp_no) REFERENCES organization.employees (emp_no) ON DELETE CASCADE,
-    PRIMARY KEY (emp_no,title, from_date)
+    PRIMARY KEY (title, from_date)
 );
 
 

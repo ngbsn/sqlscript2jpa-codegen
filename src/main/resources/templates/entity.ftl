@@ -7,27 +7,40 @@ import ${import};
 <#list table.annotations as annotation>
 ${annotation}
 </#list>
-<#if (table.numOfPrimaryKeyColumns > 1) >
-@IdClass(${table.className}.${table.className}PK.class)
-</#if>
+
 public class ${table.className}{
 <#if (table.numOfPrimaryKeyColumns > 1) >
-    static class ${table.className}PK implements Serializable{
+    @Embeddable
+    static class ${table.embeddableClass.className} implements Serializable{
         <#list table.columns as column>
         <#if column.primaryKey == true>
-            private ${column.type} ${column.fieldName};
+        <#list column.annotations as annotation>
+        ${annotation}
+        </#list>
+        private ${column.type} ${column.fieldName};
         </#if>
         </#list>
     }
-</#if>
 
-<#list table.columns as column>
-<#if column.primaryKey == true>
-    @Id
-</#if>
-<#list column.annotations as annotation>
+    @EmbeddedId
+    private ${table.embeddableClass.className} ${table.embeddableClass.fieldName};
+    <#list table.columns as column>
+    <#if column.primaryKey == false>
+    <#list column.annotations as annotation>
     ${annotation}
-</#list>
+    </#list>
     private ${column.type} ${column.fieldName};
-</#list>
+    </#if>
+    </#list>
+<#else>
+    <#list table.columns as column>
+    <#if column.primaryKey == true>
+    @Id
+    </#if>
+    <#list column.annotations as annotation>
+    ${annotation}
+    </#list>
+    private ${column.type} ${column.fieldName};
+    </#list>
+</#if>
 }

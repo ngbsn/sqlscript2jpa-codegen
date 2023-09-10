@@ -17,5 +17,6 @@ public class Table {
     private List<String> annotations = new ArrayList<>();
     private int numOfPrimaryKeyColumns;
     private List<ForeignKeyConstraint> foreignKeyConstraints = new ArrayList<>();
+    private EmbeddableClass embeddableClass;
 
 }
