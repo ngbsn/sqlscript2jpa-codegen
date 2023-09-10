@@ -13,7 +13,7 @@ public class JoinColumnsAnnotation implements Annotation {
     @Override
     public String toString() {
         return "@JoinColumns({"
-                + joinColumns.stream().map(JoinColumnAnnotation::toString).collect(Collectors.joining("," + System.lineSeparator()))
+                + joinColumns.stream().map(JoinColumnAnnotation::toString).collect(Collectors.joining(", "))
                 + "})";
     }
 }

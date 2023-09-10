@@ -63,3 +63,11 @@ CREATE TABLE organization.salaries (
     FOREIGN KEY (emp_no) REFERENCES organization.employees (emp_no) ON DELETE CASCADE,
     PRIMARY KEY (emp_no, from_date)
 );
+
+CREATE TABLE organization.contractors_salaries (
+    contractor_no   INT             NOT NULL,
+    first_name      VARCHAR(14)     NOT NULL,
+    salary          INT             NOT NULL,
+    FOREIGN KEY (contractor_no, first_name) REFERENCES organization.contractors (contractor_no, first_name) ON DELETE CASCADE,
+    PRIMARY KEY (contractor_no, first_name, salary)
+);
