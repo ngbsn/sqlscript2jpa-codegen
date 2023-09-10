@@ -43,27 +43,28 @@ public class AssociationMappingsGenerator {
                 Table table1 = tablesMap.get(foreignKeyConstraintList.get(0).getReferencedTableName());
                 Table table2 = tablesMap.get(foreignKeyConstraintList.get(1).getReferencedTableName());
 
+                //Adding @ManyToMany and @JoinTable to table1
                 Column column1 = new Column();
-                column1.setFieldName(table2.getClassName().toLowerCase());
+                column1.setFieldName(CaseUtils.toCamelCase(table2.getName(), false, '_'));
                 column1.setType(table2.getClassName());
                 column1.getAnnotations().add(ManyToManyAnnotation.builder().build().toString());
-
                 Set<JoinColumnAnnotation> joinColumnAnnotations = new HashSet<>();
                 for (String column : foreignKeyConstraintList.get(0).getColumns()) {
                     joinColumnAnnotations.add(JoinColumnAnnotation.builder().name(column).build());
                 }
-
                 Set<JoinColumnAnnotation> joinInverseColumnAnnotations = new HashSet<>();
                 for (String column : foreignKeyConstraintList.get(1).getColumns()) {
                     joinInverseColumnAnnotations.add(JoinColumnAnnotation.builder().name(column).build());
                 }
-
                 column1.getAnnotations().add(JoinTableAnnotation.builder().tableName(table.getName()).joinColumns(joinColumnAnnotations).inverseJoinColumns(joinInverseColumnAnnotations).build().toString());
+                table1.getColumns().add(column1);
 
+                //Adding @ManyToMany(mappedBy) to table2
                 Column column2 = new Column();
-                column2.setFieldName(table1.getClassName().toLowerCase());
+                column2.setFieldName(CaseUtils.toCamelCase(table1.getName(), false, '_'));
                 column2.setType(table1.getClassName());
-                column2.getAnnotations().add(ManyToManyAnnotation.builder().mappedBy(column1.getFieldName()).toString());
+                column2.getAnnotations().add(ManyToManyAnnotation.builder().mappedBy(column1.getFieldName()).build().toString());
+                table2.getColumns().add(column2);
 
             } else {
                 //Case1: There are some fields that are not foreign keys. So separate entity is needed to track Link Table
@@ -80,13 +81,13 @@ public class AssociationMappingsGenerator {
     private static void addBothUnidirectionalMappings(Table table, ForeignKeyConstraint foreignKeyConstraint) {
         Table referencedTable = tablesMap.get(foreignKeyConstraint.getReferencedTableName());
         Column foreignKeyColumn = new Column();
-        foreignKeyColumn.setFieldName(referencedTable.getClassName().toLowerCase());
+        foreignKeyColumn.setFieldName(CaseUtils.toCamelCase(referencedTable.getName(), false, '_'));
         foreignKeyColumn.setType(referencedTable.getClassName());
         foreignKeyColumn.getAnnotations().add(new ManyToOneAnnotation().toString());
         table.getColumns().add(foreignKeyColumn);
 
         Column childKeyColumn = new Column();
-        childKeyColumn.setFieldName(table.getClassName().toLowerCase());
+        childKeyColumn.setFieldName(CaseUtils.toCamelCase(table.getName(), false, '_'));
         childKeyColumn.setType("Set<" + table.getClassName() + ">");
         childKeyColumn.getAnnotations().add(OneToManyAnnotation.builder().mappedBy(foreignKeyColumn.getFieldName()).build().toString());
         referencedTable.getColumns().add(childKeyColumn);

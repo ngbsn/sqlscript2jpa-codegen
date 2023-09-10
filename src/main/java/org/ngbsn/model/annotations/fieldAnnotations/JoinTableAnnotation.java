@@ -16,10 +16,10 @@ public class JoinTableAnnotation implements Annotation {
     public String toString() {
         return "@JoinTable(name = \"" + tableName
                 + "\", "
-                + "joinColumns = {\""
+                + "joinColumns = {"
                 + joinColumns.stream().map(JoinColumnAnnotation::toString).collect(Collectors.joining("," + System.lineSeparator()))
                 + "}, "
-                + "inverseJoinColumns = {\""
+                + "inverseJoinColumns = {"
                 + inverseJoinColumns.stream().map(JoinColumnAnnotation::toString).collect(Collectors.joining("," + System.lineSeparator()))
                 + "})";
     }
