@@ -7,11 +7,17 @@ import org.ngbsn.model.annotations.Annotation;
 public class JoinColumnAnnotation implements Annotation {
     private String name;
     private String referencedColumnName;
+    private Boolean insertable;
+    private Boolean updatable;
+
 
     @Override
     public String toString() {
         String nameAttr = name != null ? "name = \"" + name + "\"" : "";
         String referencedColumnNameAttr = referencedColumnName != null ? ", referencedColumnName = \"" + referencedColumnName + "\"" : "";
-        return "@JoinColumn(" + nameAttr + referencedColumnNameAttr + ")";
+        String insertableAttr = insertable != null ? ", insertable = \"" + insertable + "\"" : "";
+        String updatableAttr = updatable != null ? ", updatable = \"" + updatable + "\"" : "";
+
+        return "@JoinColumn(" + nameAttr + referencedColumnNameAttr + insertableAttr + updatableAttr + ")";
     }
 }

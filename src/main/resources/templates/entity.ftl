@@ -10,20 +10,23 @@ ${annotation}
 
 public class ${table.className}{
 <#if (table.numOfPrimaryKeyColumns > 1) >
+    <#list table.embeddableClasses as embeddableClass>
     @Embeddable
-    static class ${table.embeddableClass.className} implements Serializable{
-        <#list table.columns as column>
-        <#if column.primaryKey == true>
+    static class ${embeddableClass.className} implements Serializable{
+        <#list embeddableClass.columns as column>
         <#list column.annotations as annotation>
         ${annotation}
         </#list>
         private ${column.type} ${column.fieldName};
-        </#if>
         </#list>
-    }
+   }
 
+    <#if embeddableClass.embeddedId == true>
     @EmbeddedId
-    private ${table.embeddableClass.className} ${table.embeddableClass.fieldName};
+    private ${embeddableClass.className} ${embeddableClass.fieldName};
+    </#if>
+    </#list>
+
     <#list table.columns as column>
     <#if column.primaryKey == false>
     <#list column.annotations as annotation>

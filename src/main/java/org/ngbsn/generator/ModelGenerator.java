@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.ngbsn.generator.AssociationMappingsGenerator.generateMappings;
 
@@ -38,17 +39,17 @@ public class ModelGenerator {
                 if (statement instanceof CreateTable parsedTable) {
                     Table table = new Table();
                     tablesMap.put(parsedTable.getTable().getName(), table);
-                    table.setName(parsedTable.getTable().getName());
-                    table.setClassName(CaseUtils.toCamelCase(table.getName(), true, '_'));
+                    table.setTableName(parsedTable.getTable().getName());
+                    table.setClassName(CaseUtils.toCamelCase(table.getTableName(), true, '_'));
 
-                    List<String> tableAnnotations = new ArrayList<>();
+                    Set<String> tableAnnotations = new HashSet<>();
                     table.setAnnotations(tableAnnotations);
                     //Adding @Entity
                     tableAnnotations.add(new EntityAnnotation().toString());
                     //Adding @Table
                     tableAnnotations.add(TableAnnotation.builder().tableName(parsedTable.getTable().getName()).build().toString());
 
-                    List<Column> columns = new ArrayList<>();
+                    Set<Column> columns = new HashSet<>();
                     table.setColumns(columns);
                     extractColumns(parsedTable, columns);
 
@@ -98,17 +99,24 @@ public class ModelGenerator {
         Optional<Index> optionalIndex = parsedTable.getIndexes().stream().filter(index -> index.getType().equals("PRIMARY KEY")).findFirst();
         List<Index.ColumnParams> columnParamsList = optionalIndex.map(Index::getColumns).orElse(null);
         if (columnParamsList != null) {
+            Set<Column> primaryKeyColumns = table.getColumns().stream().
+                    filter(column -> columnParamsList.stream().anyMatch(columnParams -> columnParams.getColumnName().equals(column.getColumnName()))).collect(Collectors.toSet());
+
             if (columnParamsList.size() > 1) {
                 table.setNumOfPrimaryKeyColumns(columnParamsList.size());
-                EmbeddableClass embeddableClass = EmbeddableClass
-                        .builder()
-                        .className(table.getClassName() + "PK")
-                        .fieldName(CaseUtils.toCamelCase(table.getName(), false, '_') + "PK")
-                        .build();
-                table.setEmbeddableClass(embeddableClass);
+                //create a embeddedId within Table
+                EmbeddableClass embeddedId = new EmbeddableClass();
+                embeddedId.setClassName(table.getClassName() + "PK");
+                embeddedId.setFieldName(CaseUtils.toCamelCase(table.getTableName(), false, '_') + "PK");
+                embeddedId.setEmbeddedId(true);
+                table.getEmbeddableClasses().add(embeddedId);
+
+                //remove the primary keys columns from table and add inside EmbeddedId
+                primaryKeyColumns.forEach(column -> {
+                    table.getColumns().remove(column);
+                    embeddedId.getColumns().add(column);
+                });
             }
-            List<Column> primaryKeyColumns = table.getColumns().stream().
-                    filter(column -> columnParamsList.stream().anyMatch(columnParams -> columnParams.getColumnName().equals(column.getName()))).toList();
             primaryKeyColumns.forEach(column -> column.setPrimaryKey(true));
         }
     }
@@ -119,15 +127,15 @@ public class ModelGenerator {
      * @param parsedTable Parsed table
      * @param columns     List of generated column models
      */
-    private static void extractColumns(CreateTable parsedTable, List<Column> columns) {
+    private static void extractColumns(CreateTable parsedTable, Set<Column> columns) {
         parsedTable.getColumnDefinitions().forEach(columnDefinition -> {
             Column column = new Column();
             columns.add(column);
-            List<String> columnAnnotations = new ArrayList<>();
+            Set<String> columnAnnotations = new HashSet<>();
             column.setAnnotations(columnAnnotations);
-            column.setName(columnDefinition.getColumnName());
+            column.setColumnName(columnDefinition.getColumnName());
             //Adding @Column
-            columnAnnotations.add(ColumnAnnotation.builder().columnName(column.getName()).build().toString());
+            columnAnnotations.add(ColumnAnnotation.builder().columnName(column.getColumnName()).build().toString());
             column.setFieldName(CaseUtils.toCamelCase(columnDefinition.getColumnName(), false, '_'));
             column.setType(SQLToJavaMapping.sqlToJavaMap.get(columnDefinition.getColDataType().getDataType()));
 

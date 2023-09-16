@@ -1,13 +1,16 @@
 package org.ngbsn.model;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-@Builder
+import java.util.HashSet;
+import java.util.Set;
+
 @Setter
 @Getter
 public class EmbeddableClass {
-    private String className;
     private String fieldName;
+    private String className;
+    private Set<Column> columns = new HashSet<>();
+    private boolean embeddedId;
 }
