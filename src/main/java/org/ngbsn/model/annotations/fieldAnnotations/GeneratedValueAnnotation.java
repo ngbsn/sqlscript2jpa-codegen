@@ -8,6 +8,6 @@ public class GeneratedValueAnnotation implements Annotation {
 
     @Override
     public String toString() {
-        return "@GeneratedValue(strategy = GenerationType.IDENTITY)";
+        return "@GeneratedValue(strategy = GenerationType.AUTO)";
     }
 }

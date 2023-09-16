@@ -39,6 +39,7 @@ public class ${table.className}{
     <#list table.columns as column>
     <#if column.primaryKey == true>
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     </#if>
     <#list column.annotations as annotation>
     ${annotation}
