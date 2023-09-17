@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -19,6 +20,14 @@ import static org.ngbsn.util.Util.packageNameToFolderStructure;
 
 public class JPACodeGenerator {
     private static final Logger logger = LoggerFactory.getLogger(JPACodeGenerator.class);
+
+    public static void main(String[] args) throws TemplateException, IOException {
+        String sqlScript = new BufferedReader(
+                new InputStreamReader(new FileInputStream(args[0]), StandardCharsets.UTF_8))
+                .lines()
+                .collect(Collectors.joining("\n"));
+        generateCode(sqlScript, args[1]);
+    }
 
     public static void generateCode(final String sqlScript, final String packageName) throws IOException, TemplateException {
         logger.info("sql script {}", sqlScript);
