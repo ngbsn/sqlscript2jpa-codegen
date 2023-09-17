@@ -7,6 +7,7 @@ import org.ngbsn.model.Table;
 import org.ngbsn.model.annotations.fieldAnnotations.JoinColumnAnnotation;
 import org.ngbsn.model.annotations.fieldAnnotations.JoinTableAnnotation;
 import org.ngbsn.model.annotations.fieldAnnotations.ManyToManyAnnotation;
+import org.ngbsn.util.Util;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +23,7 @@ public class BiDirectionalMappingsGenerator {
 
         //Adding @ManyToMany and @JoinTable to table1
         Column column1 = new Column();
-        column1.setFieldName(CaseUtils.toCamelCase(table2.getTableName(), false, '_'));
+        column1.setFieldName(Util.convertSnakeCaseToCamelCase(table2.getTableName(), false));
         column1.setType(table2.getClassName());
         column1.getAnnotations().add(ManyToManyAnnotation.builder().build().toString());
         Set<JoinColumnAnnotation> joinColumnAnnotations = new HashSet<>();
@@ -38,7 +39,7 @@ public class BiDirectionalMappingsGenerator {
 
         //Adding @ManyToMany(mappedBy) to table2
         Column column2 = new Column();
-        column2.setFieldName(CaseUtils.toCamelCase(table1.getTableName(), false, '_'));
+        column2.setFieldName(Util.convertSnakeCaseToCamelCase(table1.getTableName(), false));
         column2.setType(table1.getClassName());
         column2.getAnnotations().add(ManyToManyAnnotation.builder().mappedBy(column1.getFieldName()).build().toString());
         table2.getColumns().add(column2);

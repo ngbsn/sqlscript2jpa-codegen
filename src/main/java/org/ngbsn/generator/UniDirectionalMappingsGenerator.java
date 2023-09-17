@@ -7,6 +7,7 @@ import org.ngbsn.model.EmbeddableClass;
 import org.ngbsn.model.ForeignKeyConstraint;
 import org.ngbsn.model.Table;
 import org.ngbsn.model.annotations.fieldAnnotations.*;
+import org.ngbsn.util.Util;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -28,14 +29,14 @@ public class UniDirectionalMappingsGenerator {
         Table referencedTable = tablesMap.get(foreignKeyConstraint.getReferencedTableName());
         //In the Child table, create a new column having field name as Parent(Referenced) Table.
         Column parentTableField = new Column();
-        parentTableField.setFieldName(CaseUtils.toCamelCase(referencedTable.getTableName(), false, '_'));
+        parentTableField.setFieldName(Util.convertSnakeCaseToCamelCase(referencedTable.getTableName(), false));
         parentTableField.setType(referencedTable.getClassName());
         parentTableField.getAnnotations().add(new ManyToOneAnnotation().toString());
         table.getColumns().add(parentTableField);
 
         //In the Parent(Referenced) table, create a new column having field name as child Table.
         Column childTableField = new Column();
-        childTableField.setFieldName(CaseUtils.toCamelCase(table.getTableName(), false, '_'));
+        childTableField.setFieldName(Util.convertSnakeCaseToCamelCase(table.getTableName(), false));
         childTableField.setType("Set<" + table.getClassName() + ">");
         childTableField.getAnnotations().add(OneToManyAnnotation.builder().mappedBy(parentTableField.getFieldName()).build().toString());
         referencedTable.getColumns().add(childTableField);

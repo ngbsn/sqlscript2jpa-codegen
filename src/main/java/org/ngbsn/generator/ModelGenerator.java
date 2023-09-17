@@ -15,6 +15,7 @@ import org.ngbsn.model.annotations.entityAnnotations.TableAnnotation;
 import org.ngbsn.model.annotations.fieldAnnotations.ColumnAnnotation;
 import org.ngbsn.model.annotations.fieldAnnotations.NotNullAnnotation;
 import org.ngbsn.util.SQLToJavaMapping;
+import org.ngbsn.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,16 +39,16 @@ public class ModelGenerator {
                 //Iterating over all Tables
                 if (statement instanceof CreateTable parsedTable) {
                     Table table = new Table();
-                    tablesMap.put(parsedTable.getTable().getName(), table);
-                    table.setTableName(parsedTable.getTable().getName());
-                    table.setClassName(CaseUtils.toCamelCase(table.getTableName(), true, '_'));
+                    table.setTableName(parsedTable.getTable().getName().replaceAll("^\"|\"$", ""));
+                    tablesMap.put(table.getTableName(), table);
+                    table.setClassName(Util.convertSnakeCaseToCamelCase(table.getTableName(), true));
 
                     Set<String> tableAnnotations = new HashSet<>();
                     table.setAnnotations(tableAnnotations);
                     //Adding @Entity
                     tableAnnotations.add(new EntityAnnotation().toString());
                     //Adding @Table
-                    tableAnnotations.add(TableAnnotation.builder().tableName(parsedTable.getTable().getName()).build().toString());
+                    tableAnnotations.add(TableAnnotation.builder().tableName(table.getTableName()).build().toString());
 
                     Set<Column> columns = new HashSet<>();
                     table.setColumns(columns);
@@ -107,7 +108,7 @@ public class ModelGenerator {
                 //create a embeddedId within Table
                 EmbeddableClass embeddedId = new EmbeddableClass();
                 embeddedId.setClassName(table.getClassName() + "PK");
-                embeddedId.setFieldName(CaseUtils.toCamelCase(table.getTableName(), false, '_') + "PK");
+                embeddedId.setFieldName(Util.convertSnakeCaseToCamelCase(table.getTableName(), false) + "PK");
                 embeddedId.setEmbeddedId(true);
                 table.getEmbeddableClasses().add(embeddedId);
 
@@ -133,10 +134,10 @@ public class ModelGenerator {
             columns.add(column);
             Set<String> columnAnnotations = new HashSet<>();
             column.setAnnotations(columnAnnotations);
-            column.setColumnName(columnDefinition.getColumnName());
+            column.setColumnName(columnDefinition.getColumnName().replaceAll("^\"|\"$", ""));
             //Adding @Column
             columnAnnotations.add(ColumnAnnotation.builder().columnName(column.getColumnName()).build().toString());
-            column.setFieldName(CaseUtils.toCamelCase(columnDefinition.getColumnName(), false, '_'));
+            column.setFieldName(Util.convertSnakeCaseToCamelCase(column.getColumnName(), false));
             column.setType(SQLToJavaMapping.sqlToJavaMap.get(columnDefinition.getColDataType().getDataType()));
 
             //Check for NOT NULL

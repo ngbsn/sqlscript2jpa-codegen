@@ -17,13 +17,22 @@ public class CodeGenTest {
     private static final Logger logger = LoggerFactory.getLogger(CodeGenTest.class);
 
     @Test
-    public void testCodeGen() throws TemplateException, IOException {
+    public void testMySql() throws TemplateException, IOException {
         logger.info("Starting test");
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(Objects.requireNonNull(classLoader.getResource("sql/organization.sql")).getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("sql/mysql.sql")).getFile());
         String sqlScript = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-        String packageName = "com.ngbsn.models";
+        String packageName = "com.ngbsn.models.mysql";
         generateCode(sqlScript, packageName);
+    }
 
+    @Test
+    public void testPostgres() throws TemplateException, IOException {
+        logger.info("Starting test");
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(Objects.requireNonNull(classLoader.getResource("sql/postgres.sql")).getFile());
+        String sqlScript = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        String packageName = "com.ngbsn.models.postgres";
+        generateCode(sqlScript, packageName);
     }
 }
