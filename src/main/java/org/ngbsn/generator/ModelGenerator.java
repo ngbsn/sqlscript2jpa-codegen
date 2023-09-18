@@ -39,7 +39,7 @@ public class ModelGenerator {
                 //Iterating over all Tables
                 if (statement instanceof CreateTable parsedTable) {
                     Table table = new Table();
-                    table.setTableName(parsedTable.getTable().getName().replaceAll("^\"|\"$", ""));
+                    table.setTableName(parsedTable.getTable().getName().replaceAll("[\"']", ""));
                     tablesMap.put(table.getTableName(), table);
                     table.setClassName(Util.convertSnakeCaseToCamelCase(table.getTableName(), true));
 
@@ -134,7 +134,7 @@ public class ModelGenerator {
             columns.add(column);
             Set<String> columnAnnotations = new HashSet<>();
             column.setAnnotations(columnAnnotations);
-            column.setColumnName(columnDefinition.getColumnName().replaceAll("^\"|\"$", ""));
+            column.setColumnName(columnDefinition.getColumnName().replaceAll("[\"']", ""));
             //Adding @Column
             columnAnnotations.add(ColumnAnnotation.builder().columnName(column.getColumnName()).build().toString());
             column.setFieldName(Util.convertSnakeCaseToCamelCase(column.getColumnName(), false));
