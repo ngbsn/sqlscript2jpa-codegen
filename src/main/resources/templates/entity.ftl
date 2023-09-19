@@ -7,7 +7,6 @@ import ${import};
 <#list table.annotations as annotation>
 ${annotation}
 </#list>
-
 public class ${table.className}{
 <#if (table.numOfPrimaryKeyColumns > 1) >
     <#list table.embeddableClasses as embeddableClass>

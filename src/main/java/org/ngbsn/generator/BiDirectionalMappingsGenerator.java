@@ -17,9 +17,8 @@ import static org.ngbsn.generator.ModelGenerator.tablesMap;
 
 public class BiDirectionalMappingsGenerator {
     static void addBiDirectionalMappings(Table table, List<ForeignKeyConstraint> foreignKeyConstraintList) {
-        tablesMap.remove(table.getTableName());
-        Table table1 = tablesMap.get(foreignKeyConstraintList.get(0).getReferencedTableName());
-        Table table2 = tablesMap.get(foreignKeyConstraintList.get(1).getReferencedTableName());
+        Table table1 = tablesMap.get(foreignKeyConstraintList.get(0).getReferencedTableName().replaceAll("[\"']", ""));
+        Table table2 = tablesMap.get(foreignKeyConstraintList.get(1).getReferencedTableName().replaceAll("[\"']", ""));
 
         //Adding @ManyToMany and @JoinTable to table1
         Column column1 = new Column();

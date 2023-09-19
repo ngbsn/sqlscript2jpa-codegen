@@ -26,7 +26,8 @@ public class UniDirectionalMappingsGenerator {
      * @param foreignKeyConstraint foreignKeyConstraint
      */
     static void addBothSideUniDirectionalMappings(Table table, ForeignKeyConstraint foreignKeyConstraint) {
-        Table referencedTable = tablesMap.get(foreignKeyConstraint.getReferencedTableName());
+        Table referencedTable = tablesMap.get(foreignKeyConstraint.getReferencedTableName().replaceAll("[\"']", ""));
+
         //In the Child table, create a new column having field name as Parent(Referenced) Table.
         Column parentTableField = new Column();
         parentTableField.setFieldName(Util.convertSnakeCaseToCamelCase(referencedTable.getTableName(), false));
@@ -36,7 +37,7 @@ public class UniDirectionalMappingsGenerator {
 
         //In the Parent(Referenced) table, create a new column having field name as child Table.
         Column childTableField = new Column();
-        childTableField.setFieldName(Util.convertSnakeCaseToCamelCase(table.getTableName(), false));
+        childTableField.setFieldName(Util.convertSnakeCaseToCamelCase(table.getTableName(), false) + "Set");
         childTableField.setType("Set<" + table.getClassName() + ">");
         childTableField.getAnnotations().add(OneToManyAnnotation.builder().mappedBy(parentTableField.getFieldName()).build().toString());
         referencedTable.getColumns().add(childTableField);
