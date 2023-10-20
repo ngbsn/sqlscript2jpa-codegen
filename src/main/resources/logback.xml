@@ -9,7 +9,7 @@
         </layout>
     </appender>
 
-    <logger name="org.ngbsn" level="info" additivity="false">
+    <logger name="io.github.ngbsn" level="info" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
