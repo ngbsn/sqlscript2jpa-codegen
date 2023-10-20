@@ -47,6 +47,12 @@ public class ModelGenerator {
     }
 
     /**
+     * Clears the tables map. This is needed to have a clean start between junits
+     */
+    public static void clearTablesMap(){
+        tablesMap.clear();
+    }
+    /**
      * Iterate over all the Create Table statements and prepare the list of Table Model
      * @param statements set of statements
      */

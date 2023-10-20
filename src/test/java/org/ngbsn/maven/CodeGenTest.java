@@ -2,7 +2,9 @@ package org.ngbsn.maven;
 
 import freemarker.template.TemplateException;
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.ngbsn.generator.ModelGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +18,14 @@ import static org.ngbsn.generator.JPACodeGenerator.generateCode;
 public class CodeGenTest {
     private static final Logger logger = LoggerFactory.getLogger(CodeGenTest.class);
 
+
+    @Before
+    public void beforeTest(){
+        ModelGenerator.clearTablesMap();
+    }
     @Test
     public void testMySql() throws TemplateException, IOException {
-        logger.info("Starting test");
+        logger.info("Starting testMySql");
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(Objects.requireNonNull(classLoader.getResource("sql/mysql.sql")).getFile());
         String sqlScript = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
@@ -28,7 +35,7 @@ public class CodeGenTest {
 
     @Test
     public void testPostgres() throws TemplateException, IOException {
-        logger.info("Starting test");
+        logger.info("Starting testPostgres");
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(Objects.requireNonNull(classLoader.getResource("sql/postgres.sql")).getFile());
         String sqlScript = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
