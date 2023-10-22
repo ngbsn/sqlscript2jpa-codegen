@@ -17,6 +17,13 @@ import static io.github.ngbsn.generator.UniDirectionalMappingsGenerator.addBothS
  */
 public class AssociationMappingsGenerator {
 
+
+    private AssociationMappingsGenerator() {
+    }
+
+    /**
+     * Generate both UniDirectional and BiDirectional association mappings for all tables
+     */
     public static void generateMappings() {
         Iterator<Map.Entry<String, Table>> it = tablesMap.entrySet().iterator();
         while (it.hasNext()) {
@@ -44,9 +51,7 @@ public class AssociationMappingsGenerator {
                     //Case1: There are some fields that are not foreign keys. So separate entity is needed to track Link Table
                     //Case2: All fields are foreign keys. But, the relation exits between 2 or more entities
                     //Add @ManyToOne for each foreignKey and corresponding @OneToMany in referenced Table
-                    foreignKeyConstraintList.forEach(foreignKeyConstraint -> {
-                        addBothSideUniDirectionalMappings(table, foreignKeyConstraint);
-                    });
+                    foreignKeyConstraintList.forEach(foreignKeyConstraint -> addBothSideUniDirectionalMappings(table, foreignKeyConstraint));
                 }
             }
         }

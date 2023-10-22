@@ -3,9 +3,9 @@ package io.github.ngbsn.generator;
 import io.github.ngbsn.model.Column;
 import io.github.ngbsn.model.ForeignKeyConstraint;
 import io.github.ngbsn.model.Table;
-import io.github.ngbsn.model.annotations.fieldAnnotations.JoinColumnAnnotation;
-import io.github.ngbsn.model.annotations.fieldAnnotations.JoinTableAnnotation;
-import io.github.ngbsn.model.annotations.fieldAnnotations.ManyToManyAnnotation;
+import io.github.ngbsn.model.annotations.field.JoinColumnAnnotation;
+import io.github.ngbsn.model.annotations.field.JoinTableAnnotation;
+import io.github.ngbsn.model.annotations.field.ManyToManyAnnotation;
 import io.github.ngbsn.util.Util;
 
 import java.util.HashSet;
@@ -15,6 +15,15 @@ import java.util.Set;
 import static io.github.ngbsn.generator.ModelGenerator.tablesMap;
 
 public class BiDirectionalMappingsGenerator {
+
+    private BiDirectionalMappingsGenerator() {
+    }
+
+    /**
+     * Generate BiDirectional Mappings (many-to-many) for a specific table
+     * @param table The table to be processed
+     * @param foreignKeyConstraintList List of generated foreignKeyConstraintList models
+     */
     static void addBiDirectionalMappings(Table table, List<ForeignKeyConstraint> foreignKeyConstraintList) {
         Table table1 = tablesMap.get(foreignKeyConstraintList.get(0).getReferencedTableName().replaceAll("[\"']", ""));
         Table table2 = tablesMap.get(foreignKeyConstraintList.get(1).getReferencedTableName().replaceAll("[\"']", ""));

@@ -4,7 +4,7 @@ import io.github.ngbsn.model.Column;
 import io.github.ngbsn.model.EmbeddableClass;
 import io.github.ngbsn.model.ForeignKeyConstraint;
 import io.github.ngbsn.model.Table;
-import io.github.ngbsn.model.annotations.fieldAnnotations.*;
+import io.github.ngbsn.model.annotations.field.*;
 import io.github.ngbsn.util.Util;
 import org.apache.commons.text.WordUtils;
 
@@ -18,11 +18,13 @@ import static io.github.ngbsn.generator.ModelGenerator.tablesMap;
 
 public class UniDirectionalMappingsGenerator {
 
+    private UniDirectionalMappingsGenerator() {
+    }
+
     /**
-     * This method will handle each foreign key constraint in the table.
-     *
-     * @param table                table
-     * @param foreignKeyConstraint foreignKeyConstraint
+     * Generate UniDirectional Mappings (one-to-many and many-to-one) for a specific table
+     * @param table                Table model
+     * @param foreignKeyConstraint ForeignKeyConstraint model
      */
     static void addBothSideUniDirectionalMappings(Table table, ForeignKeyConstraint foreignKeyConstraint) {
         Table referencedTable = tablesMap.get(foreignKeyConstraint.getReferencedTableName().replaceAll("[\"']", ""));
@@ -64,15 +66,15 @@ public class UniDirectionalMappingsGenerator {
             Column foreignKeyColumn = optionalColumn.get();
             //Check if foreign key is also a primary key, by iterating through the primary key list
             Optional<Column> optionalColumnPrimaryForeign = allPrimaryKeyColumns.stream().filter(column -> column.getColumnName() != null && column.getColumnName().equals(foreignKeyColumn.getColumnName())).findFirst();
-            optionalColumnPrimaryForeign.ifPresentOrElse(column -> {
+            optionalColumnPrimaryForeign.ifPresentOrElse(column ->
                 //Case: Shared Primary key
                 //If foreign key is a primary key, don't remove it from table.
                 //Add a @MapsId annotation to the referenced table field
-                parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(column.getFieldName()).build().toString());
-            }, () -> {
+                parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(column.getFieldName()).build().toString())
+            , () ->
                 //If foreign key is not a primary key, then remove it from the table
-                optionalColumn.ifPresent(column -> table.getColumns().remove(column));
-            });
+                optionalColumn.ifPresent(column -> table.getColumns().remove(column))
+            );
         }
         //Add a @JoinColumn annotation for the referenced table field
         parentTableField.getAnnotations().add(JoinColumnAnnotation.builder().name(foreignKeyConstraint.getReferencedColumns().get(0)).referencedColumnName(foreignKeyConstraint.getReferencedColumns().get(0)).build().toString());

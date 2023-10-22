@@ -1,4 +1,4 @@
-package io.github.ngbsn.model.annotations.entityAnnotations;
+package io.github.ngbsn.model.annotations.entity;
 
 import io.github.ngbsn.model.annotations.Annotation;
 import lombok.Builder;
