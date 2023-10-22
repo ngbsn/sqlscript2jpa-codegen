@@ -1,0 +1,31 @@
+name: release-workflow
+run-name: Release run ${{ github.run_number }}
+on: 
+  workflow_dispatch: # Only run when manually started
+jobs:
+  release:
+    name: Release 
+    runs-on: ubuntu-22.04 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-package: 'jdk'
+          java-version: '17'
+          check-latest: true
+          server-id: 'ossrh'
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_PASSWORD 
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} 
+          gpg-passphrase: SIGN_KEY_PASS
+          cache: 'maven'
+      - name: Build & Deploy
+        run: |
+          mvn -U -B clean deploy -P release
+        env:
+          SIGN_KEY_PASS: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
