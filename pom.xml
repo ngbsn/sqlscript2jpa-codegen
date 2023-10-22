@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.ngbsn</groupId>
     <artifactId>sqlscript2jpa-codegen-maven-plugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>SQL Schema Script File to JPA Code Generator Maven Plugin</name>
