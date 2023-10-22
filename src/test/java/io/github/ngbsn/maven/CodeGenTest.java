@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import static io.github.ngbsn.generator.JPACodeGenerator.generateCode;
 
+//TODO write assertions
 public class CodeGenTest {
     private static final Logger logger = LoggerFactory.getLogger(CodeGenTest.class);
 

@@ -12,9 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static io.github.ngbsn.generator.ModelGenerator.tablesMap;
-
-public class BiDirectionalMappingsGenerator {
+/**
+ * Generate BiDirectional Mappings (many-to-many) for a specific table
+ */
+class BiDirectionalMappingsGenerator {
 
     private BiDirectionalMappingsGenerator() {
     }
@@ -25,8 +26,8 @@ public class BiDirectionalMappingsGenerator {
      * @param foreignKeyConstraintList List of generated foreignKeyConstraintList models
      */
     static void addBiDirectionalMappings(Table table, List<ForeignKeyConstraint> foreignKeyConstraintList) {
-        Table table1 = tablesMap.get(foreignKeyConstraintList.get(0).getReferencedTableName().replaceAll("[\"']", ""));
-        Table table2 = tablesMap.get(foreignKeyConstraintList.get(1).getReferencedTableName().replaceAll("[\"']", ""));
+        Table table1 = ModelGenerator.getTablesMap().get(foreignKeyConstraintList.get(0).getReferencedTableName().replaceAll("[\"']", ""));
+        Table table2 = ModelGenerator.getTablesMap().get(foreignKeyConstraintList.get(1).getReferencedTableName().replaceAll("[\"']", ""));
 
         //Adding @ManyToMany and @JoinTable to table1
         Column column1 = new Column();

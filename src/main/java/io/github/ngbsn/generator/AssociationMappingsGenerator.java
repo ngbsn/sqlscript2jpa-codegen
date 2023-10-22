@@ -9,13 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.github.ngbsn.generator.ModelGenerator.tablesMap;
 import static io.github.ngbsn.generator.UniDirectionalMappingsGenerator.addBothSideUniDirectionalMappings;
 
 /**
- * This class contains logic for generating all the association mappings
+ * Generate both UniDirectional and BiDirectional association mappings for all tables
  */
-public class AssociationMappingsGenerator {
+class AssociationMappingsGenerator {
 
 
     private AssociationMappingsGenerator() {
@@ -24,8 +23,8 @@ public class AssociationMappingsGenerator {
     /**
      * Generate both UniDirectional and BiDirectional association mappings for all tables
      */
-    public static void generateMappings() {
-        Iterator<Map.Entry<String, Table>> it = tablesMap.entrySet().iterator();
+    static void generateMappings() {
+        Iterator<Map.Entry<String, Table>> it = ModelGenerator.getTablesMap().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Table> item = it.next();
             Table table = item.getValue();

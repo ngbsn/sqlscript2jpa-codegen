@@ -14,8 +14,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.github.ngbsn.generator.ModelGenerator.tablesMap;
-
+/**
+ * Generate UniDirectional Mappings (one-to-many and many-to-one) for a specific table
+ */
 public class UniDirectionalMappingsGenerator {
 
     private UniDirectionalMappingsGenerator() {
@@ -27,7 +28,7 @@ public class UniDirectionalMappingsGenerator {
      * @param foreignKeyConstraint ForeignKeyConstraint model
      */
     static void addBothSideUniDirectionalMappings(Table table, ForeignKeyConstraint foreignKeyConstraint) {
-        Table referencedTable = tablesMap.get(foreignKeyConstraint.getReferencedTableName().replaceAll("[\"']", ""));
+        Table referencedTable = ModelGenerator.getTablesMap().get(foreignKeyConstraint.getReferencedTableName().replaceAll("[\"']", ""));
 
         //In the Child table, create a new column having field name as Parent(Referenced) Table.
         Column parentTableField = new Column();

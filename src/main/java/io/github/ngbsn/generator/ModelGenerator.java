@@ -34,14 +34,29 @@ public class ModelGenerator {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ModelGenerator.class);
-    protected static Map<String, Table> tablesMap = new HashMap<>();
+    private static final Map<String, Table> tablesMap = new HashMap<>();
+
+    /**
+     * Clears the tables map. This is needed to have a clean start between JUnits
+     */
+    public static void clearTablesMap() {
+        tablesMap.clear();
+    }
+
+    /**
+     * Returns the tables map.
+     */
+    public static Map<String, Table> getTablesMap() {
+        return tablesMap;
+    }
+
 
     /**
      * Parse the DDL statements using JSQL parser
      * @param sqlScript The input DDL commands used for generating the models
      * @return List of Tables models
      */
-    public static List<Table> parse(final String sqlScript) {
+    static List<Table> parse(final String sqlScript) {
         try {
             Statements statements = CCJSqlParserUtil.parseStatements(sqlScript);
             processCreateTableStatements(statements);
@@ -52,13 +67,6 @@ public class ModelGenerator {
             logger.error("Error occurred", e);
         }
         return new ArrayList<>();
-    }
-
-    /**
-     * Clears the tables map. This is needed to have a clean start between junits
-     */
-    public static void clearTablesMap() {
-        tablesMap.clear();
     }
 
     /**
@@ -149,7 +157,6 @@ public class ModelGenerator {
 
     /**
      * Extracting primary key information from the JSQL parsed data and setting them into the Table model
-     *
      * @param primaryKeyIndex JSQL primaryKeyIndex
      * @param table           Table model
      */
