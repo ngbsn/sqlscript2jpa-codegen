@@ -29,7 +29,7 @@ To use it, simply declare the following plugin in your pom file:
                 </executions>
             </plugin>
 ```
-**sqlFilePath**: Path to the SQL file containing the DDL commands.
+**sqlFilePath**: Path to the SQL file containing the DDL statements.
 
 **packageName**: The package name for the generated entities.
 
