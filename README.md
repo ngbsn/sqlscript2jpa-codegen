@@ -30,6 +30,7 @@ To use it, simply declare the following plugin in your pom file:
             </plugin>
 ```
 **sqlFilePath**: Path to the SQL file containing the DDL commands.
+
 **packageName**: The package name for the generated entities.
 
 By default, the source code will be generated under `target/generated-sources/sqlscript2jpa`
