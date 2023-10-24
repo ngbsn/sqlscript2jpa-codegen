@@ -9,6 +9,7 @@
 
     <name>SQL Schema Script File to JPA Code Generator Maven Plugin</name>
     <url>https://github.com/ngbsn/sqlscript2jpa-codegen</url>
+    <description>SQL Schema Script File to JPA Code Generator Maven Plugin</description>
 
     <licenses>
         <license>
