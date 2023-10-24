@@ -24,7 +24,7 @@ jobs:
           cache: 'maven'
       - name: Build & Deploy
         run: |
-          mvn -U -B clean deploy -P release
+          mvn -U -B clean release:prepare release:perform deploy -P release
         env:
           SIGN_KEY_PASS: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
