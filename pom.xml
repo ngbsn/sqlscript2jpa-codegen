@@ -177,7 +177,7 @@
                 <version>${maven.assembly.plugin.version}</version>
                 <configuration>
                     <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                        <descriptorRef>standalone</descriptorRef>
                     </descriptorRefs>
                     <archive>
                         <manifest>
