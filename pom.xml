@@ -176,16 +176,14 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>${maven.assembly.plugin.version}</version>
                 <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <descriptors>
+                        <descriptor>src/main/resources/assembly/standalone.xml</descriptor>
+                    </descriptors>
                     <archive>
                         <manifest>
                             <mainClass>io.github.ngbsn.generator.JPACodeGenerator</mainClass>
                         </manifest>
                     </archive>
-                    <finalName>sqlscript2jpa-codegen-standalone-${project.version}</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
