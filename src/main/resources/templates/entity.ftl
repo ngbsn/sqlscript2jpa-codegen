@@ -4,12 +4,18 @@ package ${package};
 import ${import};
 </#list>
 
+@Getter
+@Setter
+@Builder
 <#list table.annotations as annotation>
 ${annotation}
 </#list>
 public class ${table.className}{
 <#if (table.numOfPrimaryKeyColumns > 1) >
     <#list table.embeddableClasses as embeddableClass>
+    @Getter
+    @Setter
+    @Builder
     @Embeddable
     static class ${embeddableClass.className} implements Serializable{
         <#list embeddableClass.columns as column>

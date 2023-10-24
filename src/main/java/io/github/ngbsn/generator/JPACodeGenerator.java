@@ -96,6 +96,9 @@ public class JPACodeGenerator {
             imports.add("jakarta.persistence.*");
             imports.add("javax.validation.constraints.NotNull");
             imports.add("java.io.Serializable");
+            imports.add("lombok.Getter");
+            imports.add("lombok.Setter");
+            imports.add("lombok.Builder");
             root.put("imports", imports);
 
             /* Merge data-model with template */
