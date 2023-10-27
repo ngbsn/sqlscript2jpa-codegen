@@ -42,4 +42,4 @@ Get the jar from https://repo1.maven.org/maven2/io/github/ngbsn/sqlscript2jpa-co
 ```
 java -jar sqlscript2jpa-codegen-maven-plugin-1.0.3-standalone.jar "<sql_file_path>" "<package_name>"
 ```
-This will generate the JPA entities in a folder structure as defined by the package name.
+This will generate the JPA entities in a folder structure as defined by the package name under `./target/generated-sources/sqlscript2jpa`
