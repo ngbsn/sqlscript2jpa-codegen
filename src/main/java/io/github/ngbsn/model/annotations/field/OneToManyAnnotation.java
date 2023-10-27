@@ -9,6 +9,7 @@ public class OneToManyAnnotation implements Annotation {
 
     @Override
     public String toString() {
-        return "@OneToMany(mappedBy = \"" + mappedBy + "\")";
+        return "@OneToMany(mappedBy = \"" + mappedBy + "\"" + ", cascade = CascadeType.ALL, orphanRemoval = true" + ")";
     }
 }
+    
