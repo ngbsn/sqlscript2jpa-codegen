@@ -37,7 +37,7 @@ By default, the source code will be generated under `target/generated-sources/sq
 
 ## Standalone
 
-Get the jar from https://repo1.maven.org/maven2/io/github/ngbsn/sqlscript2jpa-codegen-maven-plugin/1.0.3/sqlscript2jpa-codegen-maven-plugin-1.0.3-standalone.jar
+Get the jar from https://repo1.maven.org/maven2/io/github/ngbsn/sqlscript2jpa-codegen-maven-plugin/1.0.4/sqlscript2jpa-codegen-maven-plugin-1.0.4-standalone.jar
 
 ```
 java -jar sqlscript2jpa-codegen-maven-plugin-1.0.3-standalone.jar "<sql_file_path>" "<package_name>"
