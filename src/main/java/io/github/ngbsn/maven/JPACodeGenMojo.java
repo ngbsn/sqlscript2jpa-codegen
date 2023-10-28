@@ -4,8 +4,6 @@ import io.github.ngbsn.generator.JPACodeGenerator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.slf4j.Logger;
@@ -36,7 +34,7 @@ public class JPACodeGenMojo extends AbstractMojo {
 
     @SneakyThrows
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() {
         logger.info("Executing the goal parse-schema {} {}", sqlFilePath, packageName);
 
         try (BufferedReader bufferedReader = new BufferedReader(
@@ -47,8 +45,7 @@ public class JPACodeGenMojo extends AbstractMojo {
             JPACodeGenerator.generateCode(sqlScript, packageName);
         } catch (Exception e) {
             log.error("Error occurred while running the plugin", e);
+            throw e;
         }
-
-
     }
 }

@@ -22,7 +22,8 @@ class BiDirectionalMappingsGenerator {
 
     /**
      * Generate BiDirectional Mappings (many-to-many) for a specific table
-     * @param table The table to be processed
+     *
+     * @param table                    The table to be processed
      * @param foreignKeyConstraintList List of generated foreignKeyConstraintList models
      */
     static void addBiDirectionalMappings(Table table, List<ForeignKeyConstraint> foreignKeyConstraintList) {

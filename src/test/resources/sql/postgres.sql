@@ -1,8 +1,11 @@
+-- CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
+
 CREATE TABLE "Album"
 (
     "AlbumId" int NOT NULL,
     "Title" varchar(160) NOT NULL,
     "ArtistId" INT NOT NULL,
+    "mood" mood,
     CONSTRAINT "PK_Album" PRIMARY KEY  ("AlbumId")
 );
 

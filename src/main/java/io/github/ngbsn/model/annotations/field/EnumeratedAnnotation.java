@@ -10,6 +10,6 @@ public class EnumeratedAnnotation implements Annotation {
 
     @Override
     public String toString() {
-        return "@Enumerated(EnumType." + value +")";
+        return "@Enumerated(EnumType." + value + ")";
     }
 }

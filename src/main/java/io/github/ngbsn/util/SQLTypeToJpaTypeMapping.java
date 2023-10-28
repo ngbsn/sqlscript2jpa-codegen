@@ -5,19 +5,18 @@ import java.util.Map;
 
 public class SQLTypeToJpaTypeMapping {
 
-    private SQLTypeToJpaTypeMapping() {
-    }
-
-    private static final Map<String, String> sqlToJavaMap = new HashMap<>();
-
     public static final String STRING = "String";
     public static final String BYTE_ARRAY = "byte[]";
     public static final String DOUBLE = "double";
     public static final String INT = "int";
     public static final String FLOAT = "float";
     public static final String BIG_DECIMAL = "java.math.BigDecimal";
+    private static final Map<String, String> sqlToJavaMap = new HashMap<>();
 
     static {
+        //Id
+        sqlToJavaMap.put("UUID", "java.util.UUID");
+
         // Numeric Types
         sqlToJavaMap.put("NUMERIC", BIG_DECIMAL);
         sqlToJavaMap.put("DECIMAL", BIG_DECIMAL);
@@ -89,8 +88,12 @@ public class SQLTypeToJpaTypeMapping {
 
     }
 
+    private SQLTypeToJpaTypeMapping() {
+    }
+
     /**
      * Return the JPA type mapping for a SQL type
+     *
      * @param dataType SQL type
      * @return JPA type
      */

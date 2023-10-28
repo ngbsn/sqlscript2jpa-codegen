@@ -14,5 +14,6 @@ public class Column {
     private String fieldName;
     private String type;
     private boolean primaryKey;
+    private boolean sharedPrimaryKey;
     private Set<String> annotations = new HashSet<>();
 }

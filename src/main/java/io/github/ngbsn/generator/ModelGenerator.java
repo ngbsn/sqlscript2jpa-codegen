@@ -1,5 +1,6 @@
 package io.github.ngbsn.generator;
 
+import io.github.ngbsn.exception.SQLParsingException;
 import io.github.ngbsn.model.*;
 import io.github.ngbsn.model.annotations.entity.EntityAnnotation;
 import io.github.ngbsn.model.annotations.entity.TableAnnotation;
@@ -9,8 +10,9 @@ import io.github.ngbsn.model.annotations.field.NotNullAnnotation;
 import io.github.ngbsn.util.SQLTypeToJpaTypeMapping;
 import io.github.ngbsn.util.Util;
 import jakarta.persistence.EnumType;
+import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.alter.Alter;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.create.table.ForeignKeyIndex;
@@ -19,7 +21,10 @@ import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.lang.model.SourceVersion;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -29,12 +34,10 @@ import java.util.stream.Collectors;
 public class ModelGenerator {
 
     public static final String REGEX_ALL_QUOTES = "[\"']";
-
-    private ModelGenerator() {
-    }
-
     private static final Logger logger = LoggerFactory.getLogger(ModelGenerator.class);
     private static final Map<String, Table> tablesMap = new HashMap<>();
+    private ModelGenerator() {
+    }
 
     /**
      * Clears the tables map. This is needed to have a clean start between JUnits
@@ -53,34 +56,55 @@ public class ModelGenerator {
 
     /**
      * Parse the DDL statements using JSQL parser
+     *
      * @param sqlScript The input DDL commands used for generating the models
      * @return List of Tables models
      */
-    static List<Table> parse(final String sqlScript) {
+    static List<Table> parse(final String sqlScript) throws SQLParsingException {
+        String extractedStatementWithoutDefaultConstraint = null;
         try {
-            Statements statements = CCJSqlParserUtil.parseStatements(sqlScript);
+            String[] extractedStatementsArray = sqlScript.split(";");
+            List<String> extractedStatementsList = Arrays.stream(extractedStatementsArray).filter(s -> {
+                String regexCreateTable = "CREATE\\s+TABLE";
+                Pattern patternCreateTable = Pattern.compile(regexCreateTable);
+                Matcher matcherCreateTable = patternCreateTable.matcher(s);
+
+                String regexAlterTable = "ALTER\\s+TABLE";
+                Pattern patternAlterTable = Pattern.compile(regexAlterTable);
+                Matcher matcherAlterTable = patternAlterTable.matcher(s);
+                return matcherCreateTable.find() || matcherAlterTable.find();
+            }).toList();
+            List<Statement> statements = new ArrayList<>();
+            for (String extractedStatement : extractedStatementsList) {
+                extractedStatementWithoutDefaultConstraint = Util.removeDefaultConstraint(extractedStatement);
+                statements.add(CCJSqlParserUtil.parse(extractedStatementWithoutDefaultConstraint));
+            }
             processCreateTableStatements(statements);
             processAlterTableStatements(statements);
             AssociationMappingsGenerator.generateMappings();
             return tablesMap.values().stream().toList();
-        } catch (Exception e) {
-            logger.error("Error occurred", e);
+        } catch (JSQLParserException e) {
+            logger.error("Error occurred {}", e.getMessage());
+            logger.error("Statement having issue with parsing {}", extractedStatementWithoutDefaultConstraint);
+            throw new SQLParsingException("Statement having issue with parsing");
         }
-        return new ArrayList<>();
     }
 
     /**
      * Iterate over all the JSQL Create Table  statements and prepare the list of Table Model
+     *
      * @param statements Set of JSQL statements
      */
-    private static void processCreateTableStatements(final Statements statements) {
-        statements.getStatements().forEach(statement -> {
+    private static void processCreateTableStatements(final List<Statement> statements) {
+        statements.forEach(statement -> {
             //Iterating over all Tables
             if (statement instanceof CreateTable parsedTable) {
                 Table table = new Table();
                 table.setTableName(parsedTable.getTable().getName().replaceAll(REGEX_ALL_QUOTES, ""));
                 tablesMap.put(table.getTableName(), table);
-                table.setClassName(Util.convertSnakeCaseToCamelCase(table.getTableName(), true));
+                String className = Util.convertSnakeCaseToCamelCase(table.getTableName(), true);
+                className = SourceVersion.isKeyword(className) ? className + "Entity" : className;
+                table.setClassName(className);
 
                 Set<String> tableAnnotations = new HashSet<>();
                 table.setAnnotations(tableAnnotations);
@@ -95,23 +119,28 @@ public class ModelGenerator {
                 //extract columns
                 extractColumns(table, parsedTable, columns);
 
-                //extract primary keys
-                Optional<Index> optionalIndex = parsedTable.getIndexes().stream().filter(index -> index.getType().equals("PRIMARY KEY")).findFirst();
-                extractPrimaryKeys(optionalIndex.orElse(null), table);
+                if (parsedTable.getIndexes() != null) {
+                    //extract primary keys
+                    Optional<Index> optionalIndex = parsedTable.getIndexes().stream().filter(index -> index.getType() != null &&
+                            index.getType().equals("PRIMARY KEY")).findFirst();
+                    extractPrimaryKeys(optionalIndex.orElse(null), table);
 
-                //extract foreign keys
-                List<Index> foreignKeyIndexes = parsedTable.getIndexes().stream().filter(ForeignKeyIndex.class::isInstance).toList();
-                extractForeignKeys(foreignKeyIndexes, table);
+                    //extract foreign keys
+                    List<Index> foreignKeyIndexes = parsedTable.getIndexes().stream().filter(ForeignKeyIndex.class::isInstance).toList();
+                    extractForeignKeys(foreignKeyIndexes, table);
+                }
+
             }
         });
     }
 
     /**
      * Iterate over all the JSQL Alter Table statements and prepare the list of Table Model
+     *
      * @param statements Set of JSQL statements
      */
-    private static void processAlterTableStatements(final Statements statements) {
-        statements.getStatements().forEach(statement -> {
+    private static void processAlterTableStatements(final List<Statement> statements) {
+        statements.forEach(statement -> {
             //Iterating over all Tables
             // Look for primary and foreign keys in ALTER TABLE constraints
             if (statement instanceof Alter alterTable) {
@@ -121,7 +150,7 @@ public class ModelGenerator {
                     if (alterExpression.getIndex() instanceof ForeignKeyIndex) {
                         //case: ALTER TABLE FOREIGN KEY
                         foreignKeyIndexes.add(alterExpression.getIndex());
-                    } else if (alterExpression.getIndex().getType().equals("PRIMARY KEY")) {
+                    } else if (alterExpression.getIndex() != null && alterExpression.getIndex().getType().equals("PRIMARY KEY")) {
                         //case: ALTER TABLE PRIMARY KEY
                         extractPrimaryKeys(alterExpression.getIndex(), table);
                     }
@@ -134,6 +163,7 @@ public class ModelGenerator {
 
     /**
      * Looking for all JSQL foreign keys in this table and adding it to our model
+     *
      * @param foreignKeyIndexes List of JSQL foreign key indexes
      * @param table             Table model
      */
@@ -157,6 +187,7 @@ public class ModelGenerator {
 
     /**
      * Extracting primary key information from the JSQL parsed data and setting them into the Table model
+     *
      * @param primaryKeyIndex JSQL primaryKeyIndex
      * @param table           Table model
      */
@@ -187,6 +218,7 @@ public class ModelGenerator {
 
     /**
      * Generate column models for the JSQL parsed table
+     *
      * @param parsedTable JSQL CreateTable
      * @param columns     Set of generated column models
      */
@@ -199,8 +231,10 @@ public class ModelGenerator {
             column.setColumnName(columnDefinition.getColumnName().replaceAll(REGEX_ALL_QUOTES, ""));
             //Adding @Column
             columnAnnotations.add(ColumnAnnotation.builder().columnName(column.getColumnName()).build().toString());
-            column.setFieldName(Util.convertSnakeCaseToCamelCase(column.getColumnName(), false));
-            if(columnDefinition.getColDataType().getDataType().equals("ENUM")){
+            String fieldName = Util.convertSnakeCaseToCamelCase(column.getColumnName(), false);
+            fieldName = SourceVersion.isKeyword(fieldName) ? fieldName + table.getClassName() : fieldName;
+            column.setFieldName(fieldName);
+            if (columnDefinition.getColDataType().getDataType().equals("ENUM")) {
                 TableEnum tableEnum = new TableEnum();
                 table.getTableEnums().add(tableEnum);
                 tableEnum.setEnumName(WordUtils.capitalize(column.getColumnName()) + "Enum");
@@ -210,8 +244,9 @@ public class ModelGenerator {
                 }
                 column.setType(tableEnum.getEnumName());
                 columnAnnotations.add(EnumeratedAnnotation.builder().value(EnumType.STRING).build().toString());
-            }else{
-                column.setType(SQLTypeToJpaTypeMapping.getTypeMapping(columnDefinition.getColDataType().getDataType()));
+            } else {
+                String mappedJavaType = SQLTypeToJpaTypeMapping.getTypeMapping(columnDefinition.getColDataType().getDataType());
+                column.setType(Objects.requireNonNullElse(mappedJavaType, "Object"));
             }
 
             //Check for NOT NULL

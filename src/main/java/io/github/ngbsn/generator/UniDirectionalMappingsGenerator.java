@@ -24,6 +24,7 @@ public class UniDirectionalMappingsGenerator {
 
     /**
      * Generate UniDirectional Mappings (one-to-many and many-to-one) for a specific table
+     *
      * @param table                Table model
      * @param foreignKeyConstraint ForeignKeyConstraint model
      */
@@ -32,14 +33,17 @@ public class UniDirectionalMappingsGenerator {
 
         //In the Child table, create a new column having field name as Parent(Referenced) Table.
         Column parentTableField = new Column();
-        parentTableField.setFieldName(Util.convertSnakeCaseToCamelCase(referencedTable.getTableName(), false));
+        parentTableField.setFieldName(
+                Util.convertSnakeCaseToCamelCase(String.join("", foreignKeyConstraint.getColumns()), false)
+                        + Util.convertSnakeCaseToCamelCase(referencedTable.getTableName(), true));
         parentTableField.setType(referencedTable.getClassName());
         parentTableField.getAnnotations().add(new ManyToOneAnnotation().toString());
         table.getColumns().add(parentTableField);
 
         //In the Parent(Referenced) table, create a new column having field name as child Table.
         Column childTableField = new Column();
-        childTableField.setFieldName(Util.convertSnakeCaseToCamelCase(table.getTableName(), false) + "Set");
+        childTableField.setFieldName(Util.convertSnakeCaseToCamelCase(String.join("", foreignKeyConstraint.getColumns()), false)
+                + Util.convertSnakeCaseToCamelCase(table.getTableName(), true) + "Set");
         childTableField.setType("Set<" + table.getClassName() + ">");
         childTableField.getAnnotations().add(OneToManyAnnotation.builder().mappedBy(parentTableField.getFieldName()).build().toString());
         referencedTable.getColumns().add(childTableField);
@@ -62,23 +66,25 @@ public class UniDirectionalMappingsGenerator {
 
     private static void handleSingleForeignKey(Table table, ForeignKeyConstraint foreignKeyConstraint, Column parentTableField, Set<Column> allPrimaryKeyColumns) {
         //Get the foreign key column from the table
-        Optional<Column> optionalColumn = table.getColumns().stream().filter(column -> column.getColumnName() != null && column.getColumnName().equals(foreignKeyConstraint.getReferencedColumns().get(0))).findFirst();
+        Optional<Column> optionalColumn = table.getColumns().stream().filter(column -> column.getColumnName() != null && column.getColumnName().equals(foreignKeyConstraint.getColumns().get(0))).findFirst();
         if (optionalColumn.isPresent()) {
             Column foreignKeyColumn = optionalColumn.get();
             //Check if foreign key is also a primary key, by iterating through the primary key list
             Optional<Column> optionalColumnPrimaryForeign = allPrimaryKeyColumns.stream().filter(column -> column.getColumnName() != null && column.getColumnName().equals(foreignKeyColumn.getColumnName())).findFirst();
-            optionalColumnPrimaryForeign.ifPresentOrElse(column ->
-                //Case: Shared Primary key
-                //If foreign key is a primary key, don't remove it from table.
-                //Add a @MapsId annotation to the referenced table field
-                parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(column.getFieldName()).build().toString())
-            , () ->
-                //If foreign key is not a primary key, then remove it from the table
-                optionalColumn.ifPresent(column -> table.getColumns().remove(column))
+            optionalColumnPrimaryForeign.ifPresentOrElse(column -> {
+                        //Case: Shared Primary key
+                        //If foreign key is a primary key, don't remove it from table. Set SharedPrimaryKey as true
+                        //Add a @MapsId annotation to the referenced table field
+                        column.setSharedPrimaryKey(true);
+                        parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(column.getFieldName()).build().toString());
+                    }
+                    , () ->
+                            //If foreign key is not a primary key, then remove it from the table
+                            optionalColumn.ifPresent(column -> table.getColumns().remove(column))
             );
         }
         //Add a @JoinColumn annotation for the referenced table field
-        parentTableField.getAnnotations().add(JoinColumnAnnotation.builder().name(foreignKeyConstraint.getReferencedColumns().get(0)).referencedColumnName(foreignKeyConstraint.getReferencedColumns().get(0)).build().toString());
+        parentTableField.getAnnotations().add(JoinColumnAnnotation.builder().name(foreignKeyConstraint.getColumns().get(0)).referencedColumnName(foreignKeyConstraint.getReferencedColumns().get(0)).build().toString());
     }
 
     private static void handleCompositeForeignKey(Table table, ForeignKeyConstraint foreignKeyConstraint, Column parentTableField, EmbeddableClass embeddableId, Set<Column> allPrimaryKeyColumns) {

@@ -59,7 +59,9 @@ public class ${table.className}{
     <#list table.columns as column>
     <#if column.primaryKey == true>
     @Id
+    <#if column.sharedPrimaryKey == false>
     @GeneratedValue(strategy = GenerationType.AUTO)
+    </#if>
     </#if>
     <#list column.annotations as annotation>
     ${annotation}
