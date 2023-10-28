@@ -9,7 +9,8 @@ jar to be run as a standalone tool. It internally uses JSqlParser to parse the D
 
 1. The SQL file should contain only SQL statements
 2. All SQL statements should terminate with a semicolon(;)
-3. Supported DDL statements are:
+3. Presence of other intructions such as PL/SQL blocks may get ignored if properly terminated with semicolons.
+4. Supported DDL statements are:
     * CREATE TABLE
     * ALTER TABLE ADD CONSTRAINT PRIMARY KEY
     * ALTER TABLE ADD CONSTRAINT FOREIGN KEY
