@@ -42,7 +42,7 @@ public class JPACodeGenerator {
      * @throws TemplateException Thrown if template couldn't be processed
      */
     public static void generateCode(final String sqlScript, final String packageName) throws IOException, TemplateException {
-        logger.info("sql script {}", sqlScript);
+        logger.debug("sql script {}", sqlScript);
         List<Table> tables = generateModels(sqlScript);
         processTemplate(tables, packageName);
     }

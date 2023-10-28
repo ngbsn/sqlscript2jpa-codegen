@@ -1,21 +1,21 @@
 package io.github.ngbsn.generator;
 
-import io.github.ngbsn.model.Column;
-import io.github.ngbsn.model.EmbeddableClass;
-import io.github.ngbsn.model.ForeignKeyConstraint;
-import io.github.ngbsn.model.Table;
+import io.github.ngbsn.model.*;
 import io.github.ngbsn.model.annotations.entity.EntityAnnotation;
 import io.github.ngbsn.model.annotations.entity.TableAnnotation;
 import io.github.ngbsn.model.annotations.field.ColumnAnnotation;
+import io.github.ngbsn.model.annotations.field.EnumeratedAnnotation;
 import io.github.ngbsn.model.annotations.field.NotNullAnnotation;
-import io.github.ngbsn.util.SQLToJavaMapping;
+import io.github.ngbsn.util.SQLTypeToJpaTypeMapping;
 import io.github.ngbsn.util.Util;
+import jakarta.persistence.EnumType;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.alter.Alter;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.create.table.ForeignKeyIndex;
 import net.sf.jsqlparser.statement.create.table.Index;
+import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +93,7 @@ public class ModelGenerator {
                 table.setColumns(columns);
 
                 //extract columns
-                extractColumns(parsedTable, columns);
+                extractColumns(table, parsedTable, columns);
 
                 //extract primary keys
                 Optional<Index> optionalIndex = parsedTable.getIndexes().stream().filter(index -> index.getType().equals("PRIMARY KEY")).findFirst();
@@ -190,7 +190,7 @@ public class ModelGenerator {
      * @param parsedTable JSQL CreateTable
      * @param columns     Set of generated column models
      */
-    private static void extractColumns(final CreateTable parsedTable, final Set<Column> columns) {
+    private static void extractColumns(final Table table, final CreateTable parsedTable, final Set<Column> columns) {
         parsedTable.getColumnDefinitions().forEach(columnDefinition -> {
             Column column = new Column();
             columns.add(column);
@@ -200,7 +200,19 @@ public class ModelGenerator {
             //Adding @Column
             columnAnnotations.add(ColumnAnnotation.builder().columnName(column.getColumnName()).build().toString());
             column.setFieldName(Util.convertSnakeCaseToCamelCase(column.getColumnName(), false));
-            column.setType(SQLToJavaMapping.getSqlToJavaMap().get(columnDefinition.getColDataType().getDataType()));
+            if(columnDefinition.getColDataType().getDataType().equals("ENUM")){
+                TableEnum tableEnum = new TableEnum();
+                table.getTableEnums().add(tableEnum);
+                tableEnum.setEnumName(WordUtils.capitalize(column.getColumnName()) + "Enum");
+                List<String> values = tableEnum.getValues();
+                for (String s : columnDefinition.getColDataType().getArgumentsStringList()) {
+                    values.add(s.replaceAll(REGEX_ALL_QUOTES, ""));
+                }
+                column.setType(tableEnum.getEnumName());
+                columnAnnotations.add(EnumeratedAnnotation.builder().value(EnumType.STRING).build().toString());
+            }else{
+                column.setType(SQLTypeToJpaTypeMapping.getTypeMapping(columnDefinition.getColDataType().getDataType()));
+            }
 
             //Check for NOT NULL
             if (columnDefinition.getColumnSpecs() != null) {

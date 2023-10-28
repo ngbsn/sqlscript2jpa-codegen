@@ -11,6 +11,19 @@ import ${import};
 ${annotation}
 </#list>
 public class ${table.className}{
+
+    <#list table.tableEnums as tableEnum>
+    enum ${tableEnum.enumName}{
+        <#list tableEnum.values as value>
+        <#if value?is_last>
+        ${value}
+        <#else>
+        ${value},
+        </#if>
+        </#list>
+    }
+    </#list>
+
 <#if (table.numOfPrimaryKeyColumns > 1) >
     <#list table.embeddableClasses as embeddableClass>
     @Getter
@@ -23,8 +36,9 @@ public class ${table.className}{
         ${annotation}
         </#list>
         private ${column.type} ${column.fieldName};
+
         </#list>
-   }
+    }
 
     <#if embeddableClass.embeddedId == true>
     @EmbeddedId
@@ -39,6 +53,7 @@ public class ${table.className}{
     </#list>
     private ${column.type} ${column.fieldName};
     </#if>
+
     </#list>
 <#else>
     <#list table.columns as column>
@@ -50,6 +65,7 @@ public class ${table.className}{
     ${annotation}
     </#list>
     private ${column.type} ${column.fieldName};
+
     </#list>
 </#if>
 }

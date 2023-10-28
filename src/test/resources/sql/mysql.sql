@@ -13,6 +13,7 @@ CREATE TABLE organization.employees (
     first_name  VARCHAR(14)     NOT NULL,
     last_name   VARCHAR(16)     NOT NULL,
     hire_date   DATE            NOT NULL,
+    grade ENUM('E1', 'E2', 'E3', 'M1', 'M2', 'M3'),
     PRIMARY KEY (emp_no)
 );
 
