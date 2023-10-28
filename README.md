@@ -31,6 +31,15 @@ To use it, simply declare the following plugin in your pom file:
                 </executions>
             </plugin>
 ```
+Also, you would need to add lombok to your dependencies
+```xml
+            <dependency>
+               <groupId>org.projectlombok</groupId>
+               <artifactId>lombok</artifactId>
+               <version>1.18.28</version>
+               <scope>provided</scope>
+            </dependency>
+```
 
 **sqlFilePath**: Path to the SQL file containing the DDL statements.
 
