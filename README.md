@@ -5,6 +5,15 @@ jar to be run as a standalone tool. It internally uses JSqlParser to parse the D
 
 ### Getting Started
 
+## Prerequisites
+
+1. The SQL file should contain only SQL statements
+2. All SQL statements should terminate with a semicolon(;)
+3. Supported DDL statements are:
+    * CREATE TABLE
+    * ALTER TABLE ADD CONSTRAINT PRIMARY KEY
+    * ALTER TABLE ADD CONSTRAINT FOREIGN KEY
+
 ## Maven
 
 **sqlscript2jpa-codegen** is available
@@ -31,7 +40,9 @@ To use it, simply declare the following plugin in your pom file:
                 </executions>
             </plugin>
 ```
-Also, you would need to add lombok to your dependencies
+
+Also, you would need to add lombok to your dependencies:
+
 ```xml
             <dependency>
                <groupId>org.projectlombok</groupId>
@@ -50,7 +61,7 @@ By default, the source code will be generated under `target/generated-sources/sq
 ## Standalone
 
 Get the jar
-from https://repo1.maven.org/maven2/io/github/ngbsn/sqlscript2jpa-codegen-maven-plugin/1.0.4/sqlscript2jpa-codegen-maven-plugin-1.0.4-standalone.jar
+from https://repo1.maven.org/maven2/io/github/ngbsn/sqlscript2jpa-codegen-maven-plugin/1.0.5/sqlscript2jpa-codegen-maven-plugin-1.0.5-standalone.jar
 
 ```
 java -jar sqlscript2jpa-codegen-maven-plugin-1.0.4-standalone.jar "<sql_file_path>" "<package_name>"
@@ -58,3 +69,4 @@ java -jar sqlscript2jpa-codegen-maven-plugin-1.0.4-standalone.jar "<sql_file_pat
 
 This will generate the JPA entities in a folder structure as defined by the package name
 under `./target/generated-sources/sqlscript2jpa`
+
