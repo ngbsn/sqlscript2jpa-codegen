@@ -32,7 +32,7 @@ public class Util {
      * @param captializeFirstChar Whether the first char is upper case. This is applicable for Table names
      * @return Field names and class names
      */
-    public static String convertSnakeCaseToCamelCase(String word, boolean captializeFirstChar) {
+    public static String convertSnakeCaseToCamelCase(String word, final boolean captializeFirstChar) {
         word = captializeFirstChar ? WordUtils.capitalize(word) : WordUtils.uncapitalize(word);
         return word.contains("_") ? CaseUtils.toCamelCase(word, captializeFirstChar, '_') : word;
     }

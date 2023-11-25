@@ -8,7 +8,10 @@ import io.github.ngbsn.model.annotations.field.*;
 import io.github.ngbsn.util.Util;
 import org.apache.commons.text.WordUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,7 +29,7 @@ public class UniDirectionalMappingsGenerator {
      * @param table                Table model
      * @param foreignKeyConstraint ForeignKeyConstraint model
      */
-    static void addBothSideUniDirectionalMappings(Table table, ForeignKeyConstraint foreignKeyConstraint) {
+    static void addBothSideUniDirectionalMappings(final Table table, final ForeignKeyConstraint foreignKeyConstraint) {
         Table referencedTable = ModelGenerator.getTablesMap().get(foreignKeyConstraint.getReferencedTableName().replaceAll("[\"']", ""));
 
         //In the Child table, create a new column having field name as Parent(Referenced) Table.
@@ -49,7 +52,7 @@ public class UniDirectionalMappingsGenerator {
         //get EmbeddedId for this table
         Optional<EmbeddableClass> optionalEmbeddableId = table.getEmbeddableClasses().stream().filter(EmbeddableClass::isEmbeddedId).findFirst();
         EmbeddableClass embeddableId = optionalEmbeddableId.orElse(null);
-        Set<Column> allPrimaryKeyColumns = getAllPrimaryKeys(table, embeddableId); //get all primary keys
+        List<Column> allPrimaryKeyColumns = getAllPrimaryKeys(table, embeddableId); //get all primary keys
 
         //Case: Composite Foreign key
         if (foreignKeyConstraint.getColumns().size() > 1) {
@@ -62,7 +65,8 @@ public class UniDirectionalMappingsGenerator {
         }
     }
 
-    private static void handleSingleForeignKey(Table table, ForeignKeyConstraint foreignKeyConstraint, Column parentTableField, Set<Column> allPrimaryKeyColumns) {
+    private static void handleSingleForeignKey(final Table table, final ForeignKeyConstraint foreignKeyConstraint,
+                                               final Column parentTableField, final List<Column> allPrimaryKeyColumns) {
         //Get the foreign key column from the table
         Optional<Column> optionalColumn = table.getColumns().stream().filter(column -> column.getColumnName() != null && column.getColumnName().equals(foreignKeyConstraint.getColumns().get(0))).findFirst();
         if (optionalColumn.isPresent()) {
@@ -85,18 +89,19 @@ public class UniDirectionalMappingsGenerator {
         parentTableField.getAnnotations().add(JoinColumnAnnotation.builder().name(foreignKeyConstraint.getColumns().get(0)).referencedColumnName(foreignKeyConstraint.getReferencedColumns().get(0)).build().toString());
     }
 
-    private static void handleCompositeForeignKey(Table table, ForeignKeyConstraint foreignKeyConstraint, Column parentTableField, EmbeddableClass embeddableId, Set<Column> allPrimaryKeyColumns) {
-        Set<Column> setOfForeignKeyColumns = setOfForeignKeys(table, foreignKeyConstraint);
+    private static void handleCompositeForeignKey(final Table table, final ForeignKeyConstraint foreignKeyConstraint, final Column parentTableField,
+                                                  final EmbeddableClass embeddableId, final List<Column> allPrimaryKeyColumns) {
+        List<Column> listOfForeignKeyColumns = listOfForeignKeys(table, foreignKeyConstraint);
         //Case: Shared Composite Primary Key
         //If composite foreign key is inside the composite primary key, don't remove them from table.
         //This case assumes there is a primary composite key
         //Add a @MapsId annotation to the referenced table field
-        if (embeddableId != null && allPrimaryKeyColumns.containsAll(setOfForeignKeyColumns)) {
-            handleSharedCompositePrimaryKey(table, parentTableField, embeddableId, setOfForeignKeyColumns);
+        if (embeddableId != null && new HashSet<>(allPrimaryKeyColumns).containsAll(listOfForeignKeyColumns)) {
+            handleSharedCompositePrimaryKey(table, parentTableField, embeddableId, listOfForeignKeyColumns);
         } else {
             //There is no primary Composite key
             //If composite foreign key is not inside the composite primary key, then remove it from the table
-            setOfForeignKeyColumns.forEach(column -> table.getColumns().remove(column));
+            listOfForeignKeyColumns.forEach(column -> table.getColumns().remove(column));
         }
 
         List<JoinColumnAnnotation> joinColumns = new ArrayList<>();
@@ -108,7 +113,8 @@ public class UniDirectionalMappingsGenerator {
         parentTableField.getAnnotations().add(JoinColumnsAnnotation.builder().joinColumns(joinColumns).build().toString());
     }
 
-    private static void handleSharedCompositePrimaryKey(Table table, Column parentTableField, EmbeddableClass embeddableId, Set<Column> setOfForeignKeyColumns) {
+    private static void handleSharedCompositePrimaryKey(final Table table, final Column parentTableField,
+                                                        final EmbeddableClass embeddableId, final List<Column> setOfForeignKeyColumns) {
         EmbeddableClass foreignCompositeKeyEmbedded = new EmbeddableClass(); //Create a new embeddable for this foreign composite key
         String embeddableName = setOfForeignKeyColumns.stream().map(Column::getFieldName).collect(Collectors.joining());
         foreignCompositeKeyEmbedded.setClassName(WordUtils.capitalize(embeddableName));
@@ -129,18 +135,18 @@ public class UniDirectionalMappingsGenerator {
             parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(foreignCompositeField.getFieldName()).build().toString());
     }
 
-    private static Set<Column> setOfForeignKeys(Table table, ForeignKeyConstraint foreignKeyConstraint) {
+    private static List<Column> listOfForeignKeys(final Table table, final ForeignKeyConstraint foreignKeyConstraint) {
         Stream<Column> allTableForeignKeyColumns = table.getColumns().stream();
         Stream<Column> allEmbeddedForeignKeyColumns = table.getEmbeddableClasses().stream().flatMap(embeddableClass -> embeddableClass.getColumns().stream());
-        return Stream.concat(allTableForeignKeyColumns, allEmbeddedForeignKeyColumns).filter(column -> foreignKeyConstraint.getColumns().stream().anyMatch(s -> s.equals(column.getColumnName()))).collect(Collectors.toSet());
+        return Stream.concat(allTableForeignKeyColumns, allEmbeddedForeignKeyColumns).filter(column -> foreignKeyConstraint.getColumns().stream().anyMatch(s -> s.equals(column.getColumnName()))).toList();
     }
 
-    private static Set<Column> getAllPrimaryKeys(Table table, EmbeddableClass embeddableId) {
-        //Get set of primary Keys
+    private static List<Column> getAllPrimaryKeys(final Table table, final EmbeddableClass embeddableId) {
+        //Get list of primary Keys
         if (embeddableId != null) {
-            return embeddableId.getColumns().stream().filter(Column::isPrimaryKey).collect(Collectors.toSet());
+            return embeddableId.getColumns().stream().filter(Column::isPrimaryKey).toList();
         } else {
-            return table.getColumns().stream().filter(Column::isPrimaryKey).collect(Collectors.toSet());
+            return table.getColumns().stream().filter(Column::isPrimaryKey).toList();
         }
     }
 

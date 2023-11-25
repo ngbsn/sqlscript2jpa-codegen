@@ -25,7 +25,6 @@ import javax.lang.model.SourceVersion;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * This class will parse the SQL script and generate the Table models for each table in the script
@@ -93,7 +92,7 @@ public class ModelGenerator {
     /**
      * Iterate over all the JSQL Create Table  statements and prepare the list of Table Model
      *
-     * @param statements Set of JSQL statements
+     * @param statements List of JSQL statements
      */
     private static void processCreateTableStatements(final List<Statement> statements) {
         statements.forEach(statement -> {
@@ -137,7 +136,7 @@ public class ModelGenerator {
     /**
      * Iterate over all the JSQL Alter Table statements and prepare the list of Table Model
      *
-     * @param statements Set of JSQL statements
+     * @param statements List of JSQL statements
      */
     private static void processAlterTableStatements(final List<Statement> statements) {
         statements.forEach(statement -> {
@@ -194,8 +193,8 @@ public class ModelGenerator {
     private static void extractPrimaryKeys(final Index primaryKeyIndex, final Table table) {
         List<Index.ColumnParams> columnParamsList = primaryKeyIndex != null ? primaryKeyIndex.getColumns() : null;
         if (columnParamsList != null) {
-            Set<Column> primaryKeyColumns = table.getColumns().stream().
-                    filter(column -> columnParamsList.stream().anyMatch(columnParams -> columnParams.getColumnName().replaceAll(REGEX_ALL_QUOTES, "").equals(column.getColumnName()))).collect(Collectors.toSet());
+            List<Column> primaryKeyColumns = table.getColumns().stream().
+                    filter(column -> columnParamsList.stream().anyMatch(columnParams -> columnParams.getColumnName().replaceAll(REGEX_ALL_QUOTES, "").equals(column.getColumnName()))).toList();
 
             if (columnParamsList.size() > 1) {
                 table.setNumOfPrimaryKeyColumns(columnParamsList.size());
