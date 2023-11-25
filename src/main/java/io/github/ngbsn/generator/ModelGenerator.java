@@ -202,8 +202,7 @@ public class ModelGenerator {
                 EmbeddableClass embeddedId = new EmbeddableClass();
                 embeddedId.setClassName(table.getClassName() + "PK");
                 embeddedId.setFieldName(Util.convertSnakeCaseToCamelCase(table.getTableName(), false) + "PK");
-                embeddedId.setEmbeddedId(true);
-                table.getEmbeddableClasses().add(embeddedId);
+                table.setEmbeddedId(embeddedId);
 
                 //remove the primary keys columns from table and add inside EmbeddedId
                 primaryKeyColumns.forEach(column -> {
@@ -225,11 +224,11 @@ public class ModelGenerator {
         parsedTable.getColumnDefinitions().forEach(columnDefinition -> {
             Column column = new Column();
             columns.add(column);
-            List<String> columnAnnotations = new ArrayList<>();
-            column.setAnnotations(columnAnnotations);
+            List<String> fieldAnnotations = new ArrayList<>();
+            column.setAnnotations(fieldAnnotations);
             column.setColumnName(columnDefinition.getColumnName().replaceAll(REGEX_ALL_QUOTES, ""));
             //Adding @Column
-            columnAnnotations.add(ColumnAnnotation.builder().columnName(column.getColumnName()).build().toString());
+            fieldAnnotations.add(ColumnAnnotation.builder().columnName(column.getColumnName()).build().toString());
             String fieldName = Util.convertSnakeCaseToCamelCase(column.getColumnName(), false);
             fieldName = SourceVersion.isKeyword(fieldName) ? fieldName + table.getClassName() : fieldName;
             column.setFieldName(fieldName);
@@ -242,7 +241,7 @@ public class ModelGenerator {
                     values.add(s.replaceAll(REGEX_ALL_QUOTES, ""));
                 }
                 column.setType(tableEnum.getEnumName());
-                columnAnnotations.add(EnumeratedAnnotation.builder().value(EnumType.STRING).build().toString());
+                fieldAnnotations.add(EnumeratedAnnotation.builder().value(EnumType.STRING).build().toString());
             } else {
                 String mappedJavaType = SQLTypeToJpaTypeMapping.getTypeMapping(columnDefinition.getColDataType().getDataType());
                 column.setType(Objects.requireNonNullElse(mappedJavaType, "Object"));
@@ -252,7 +251,7 @@ public class ModelGenerator {
             if (columnDefinition.getColumnSpecs() != null) {
                 String constraints = String.join(" ", columnDefinition.getColumnSpecs());
                 if (constraints.contains("NOT NULL")) {
-                    columnAnnotations.add(NotNullAnnotation.builder().build().toString());
+                    fieldAnnotations.add(NotNullAnnotation.builder().build().toString());
                 }
             }
         });

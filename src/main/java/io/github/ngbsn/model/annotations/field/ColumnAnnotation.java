@@ -6,9 +6,14 @@ import lombok.Builder;
 @Builder
 public class ColumnAnnotation implements Annotation {
     private String columnName;
+    private Boolean insertable;
+    private Boolean updatable;
 
     @Override
     public String toString() {
-        return "@Column(name = \"" + columnName + "\")";
+        String nameAttr = columnName != null ? "name = \"" + columnName + "\"" : "";
+        String insertableAttr = insertable != null ? ", insertable = " + insertable : "";
+        String updatableAttr = updatable != null ? ", updatable = " + updatable : "";
+        return "@Column(" + nameAttr + insertableAttr + updatableAttr + ")";
     }
 }

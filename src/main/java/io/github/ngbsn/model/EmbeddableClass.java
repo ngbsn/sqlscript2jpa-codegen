@@ -12,5 +12,4 @@ public class EmbeddableClass {
     private String fieldName;
     private String className;
     private List<Column> columns = new ArrayList<>();
-    private boolean embeddedId;
 }

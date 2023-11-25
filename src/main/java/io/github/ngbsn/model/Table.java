@@ -18,5 +18,6 @@ public class Table {
     private int numOfPrimaryKeyColumns;
     private List<ForeignKeyConstraint> foreignKeyConstraints = new ArrayList<>();
     private List<EmbeddableClass> embeddableClasses = new ArrayList<>();
+    private EmbeddableClass embeddedId;
     private List<TableEnum> tableEnums = new ArrayList<>();
 }

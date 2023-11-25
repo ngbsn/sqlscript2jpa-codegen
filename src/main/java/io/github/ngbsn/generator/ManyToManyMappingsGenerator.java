@@ -14,9 +14,9 @@ import java.util.List;
 /**
  * Generate BiDirectional Mappings (many-to-many) for a specific table
  */
-class BiDirectionalMappingsGenerator {
+class ManyToManyMappingsGenerator {
 
-    private BiDirectionalMappingsGenerator() {
+    private ManyToManyMappingsGenerator() {
     }
 
     /**
@@ -25,14 +25,14 @@ class BiDirectionalMappingsGenerator {
      * @param table                    The table to be processed
      * @param foreignKeyConstraintList List of generated foreignKeyConstraintList models
      */
-    static void addBiDirectionalMappings(final Table table, final List<ForeignKeyConstraint> foreignKeyConstraintList) {
+    static void addManyToManyMappings(final Table table, final List<ForeignKeyConstraint> foreignKeyConstraintList) {
         Table table1 = ModelGenerator.getTablesMap().get(foreignKeyConstraintList.get(0).getReferencedTableName().replaceAll("[\"']", ""));
         Table table2 = ModelGenerator.getTablesMap().get(foreignKeyConstraintList.get(1).getReferencedTableName().replaceAll("[\"']", ""));
 
         //Adding @ManyToMany and @JoinTable to table1
         Column column1 = new Column();
         column1.setFieldName(Util.convertSnakeCaseToCamelCase(table2.getTableName(), false));
-        column1.setType(table2.getClassName());
+        column1.setType("Set<" + table2.getClassName() + ">");
         column1.getAnnotations().add(ManyToManyAnnotation.builder().build().toString());
         List<JoinColumnAnnotation> joinColumnAnnotations = new ArrayList<>();
         for (String column : foreignKeyConstraintList.get(0).getColumns()) {
@@ -48,7 +48,7 @@ class BiDirectionalMappingsGenerator {
         //Adding @ManyToMany(mappedBy) to table2
         Column column2 = new Column();
         column2.setFieldName(Util.convertSnakeCaseToCamelCase(table1.getTableName(), false));
-        column2.setType(table1.getClassName());
+        column2.setType("Set<" + table1.getClassName() + ">");
         column2.getAnnotations().add(ManyToManyAnnotation.builder().mappedBy(column1.getFieldName()).build().toString());
         table2.getColumns().add(column2);
     }

@@ -41,12 +41,25 @@ public class ${table.className}{
 
         </#list>
     }
-
-    <#if embeddableClass.embeddedId == true>
-    @EmbeddedId
-    private ${embeddableClass.className} ${embeddableClass.fieldName};
-    </#if>
     </#list>
+
+    <#if table.embeddedId??>
+    @Getter
+    @Setter
+    @Builder
+    @Embeddable
+    public static class ${table.embeddedId.className} implements Serializable{
+        <#list table.embeddedId.columns as column>
+        <#list column.annotations as annotation>
+        ${annotation}
+        </#list>
+        private ${column.type} ${column.fieldName};
+
+        </#list>
+    }
+    @EmbeddedId
+    private ${table.embeddedId.className} ${table.embeddedId.fieldName};
+    </#if>
 
     <#list table.columns as column>
     <#if column.primaryKey == false>
