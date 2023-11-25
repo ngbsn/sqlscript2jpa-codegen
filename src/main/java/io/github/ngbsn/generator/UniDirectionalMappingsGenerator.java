@@ -8,9 +8,7 @@ import io.github.ngbsn.model.annotations.field.*;
 import io.github.ngbsn.util.Util;
 import org.apache.commons.text.WordUtils;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,7 +99,7 @@ public class UniDirectionalMappingsGenerator {
             setOfForeignKeyColumns.forEach(column -> table.getColumns().remove(column));
         }
 
-        Set<JoinColumnAnnotation> joinColumns = new HashSet<>();
+        List<JoinColumnAnnotation> joinColumns = new ArrayList<>();
         //Create the @JoinColumn annotations for the parentTableField
         for (int i = 0; i < foreignKeyConstraint.getColumns().size(); i++) {
             JoinColumnAnnotation joinColumnAnnotation = JoinColumnAnnotation.builder().name(foreignKeyConstraint.getColumns().get(i)).referencedColumnName(foreignKeyConstraint.getReferencedColumns().get(i)).build();

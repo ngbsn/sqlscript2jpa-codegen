@@ -8,7 +8,7 @@ import io.github.ngbsn.model.annotations.field.JoinTableAnnotation;
 import io.github.ngbsn.model.annotations.field.ManyToManyAnnotation;
 import io.github.ngbsn.util.Util;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -35,11 +35,11 @@ class BiDirectionalMappingsGenerator {
         column1.setFieldName(Util.convertSnakeCaseToCamelCase(table2.getTableName(), false));
         column1.setType(table2.getClassName());
         column1.getAnnotations().add(ManyToManyAnnotation.builder().build().toString());
-        Set<JoinColumnAnnotation> joinColumnAnnotations = new HashSet<>();
+        List<JoinColumnAnnotation> joinColumnAnnotations = new ArrayList<>();
         for (String column : foreignKeyConstraintList.get(0).getColumns()) {
             joinColumnAnnotations.add(JoinColumnAnnotation.builder().name(column).build());
         }
-        Set<JoinColumnAnnotation> joinInverseColumnAnnotations = new HashSet<>();
+        List<JoinColumnAnnotation> joinInverseColumnAnnotations = new ArrayList<>();
         for (String column : foreignKeyConstraintList.get(1).getColumns()) {
             joinInverseColumnAnnotations.add(JoinColumnAnnotation.builder().name(column).build());
         }

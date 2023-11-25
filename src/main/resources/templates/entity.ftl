@@ -4,6 +4,8 @@ package ${package};
 import ${import};
 </#list>
 
+// Generated source code
+
 @Getter
 @Setter
 @Builder
@@ -13,7 +15,7 @@ ${annotation}
 public class ${table.className}{
 
     <#list table.tableEnums as tableEnum>
-    enum ${tableEnum.enumName}{
+    public enum ${tableEnum.enumName}{
         <#list tableEnum.values as value>
         <#if value?is_last>
         ${value}
@@ -30,7 +32,7 @@ public class ${table.className}{
     @Setter
     @Builder
     @Embeddable
-    static class ${embeddableClass.className} implements Serializable{
+    public static class ${embeddableClass.className} implements Serializable{
         <#list embeddableClass.columns as column>
         <#list column.annotations as annotation>
         ${annotation}

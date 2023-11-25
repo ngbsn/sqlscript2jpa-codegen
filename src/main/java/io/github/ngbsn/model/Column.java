@@ -3,7 +3,8 @@ package io.github.ngbsn.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -15,5 +16,5 @@ public class Column {
     private String type;
     private boolean primaryKey;
     private boolean sharedPrimaryKey;
-    private Set<String> annotations = new HashSet<>();
+    private List<String> annotations = new ArrayList<>();
 }

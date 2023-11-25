@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -15,10 +14,10 @@ public class Table {
 
     private String tableName;
     private String className;
-    private Set<Column> columns = new HashSet<>();
-    private Set<String> annotations = new HashSet<>();
+    private List<Column> columns = new ArrayList<>();
+    private List<String> annotations = new ArrayList<>();
     private int numOfPrimaryKeyColumns;
     private List<ForeignKeyConstraint> foreignKeyConstraints = new ArrayList<>();
-    private Set<EmbeddableClass> embeddableClasses = new HashSet<>();
-    private Set<TableEnum> tableEnums = new HashSet<>();
+    private List<EmbeddableClass> embeddableClasses = new ArrayList<>();
+    private List<TableEnum> tableEnums = new ArrayList<>();
 }

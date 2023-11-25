@@ -106,14 +106,14 @@ public class ModelGenerator {
                 className = SourceVersion.isKeyword(className) ? className + "Entity" : className;
                 table.setClassName(className);
 
-                Set<String> tableAnnotations = new HashSet<>();
+                List<String> tableAnnotations = new ArrayList<>();
                 table.setAnnotations(tableAnnotations);
                 //Adding @Entity
                 tableAnnotations.add(new EntityAnnotation().toString());
                 //Adding @Table
                 tableAnnotations.add(TableAnnotation.builder().tableName(table.getTableName()).build().toString());
 
-                Set<Column> columns = new HashSet<>();
+                List<Column> columns = new ArrayList<>();
                 table.setColumns(columns);
 
                 //extract columns
@@ -222,11 +222,11 @@ public class ModelGenerator {
      * @param parsedTable JSQL CreateTable
      * @param columns     Set of generated column models
      */
-    private static void extractColumns(final Table table, final CreateTable parsedTable, final Set<Column> columns) {
+    private static void extractColumns(final Table table, final CreateTable parsedTable, final List<Column> columns) {
         parsedTable.getColumnDefinitions().forEach(columnDefinition -> {
             Column column = new Column();
             columns.add(column);
-            Set<String> columnAnnotations = new HashSet<>();
+            List<String> columnAnnotations = new ArrayList<>();
             column.setAnnotations(columnAnnotations);
             column.setColumnName(columnDefinition.getColumnName().replaceAll(REGEX_ALL_QUOTES, ""));
             //Adding @Column

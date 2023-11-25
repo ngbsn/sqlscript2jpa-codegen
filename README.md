@@ -19,27 +19,49 @@ jar to be run as a standalone tool. It internally uses JSqlParser to parse the D
 
 **sqlscript2jpa-codegen** is available
 at [Maven Central Repository](https://central.sonatype.com/artifact/io.github.ngbsn/sqlscript2jpa-codegen-maven-plugin).
-To use it, simply declare the following plugin in your pom file:
+To use it, simply declare the following plugins in your pom file:
 
 ```xml
-            <plugin>
-                <groupId>io.github.ngbsn</groupId>
-                <artifactId>sqlscript2jpa-codegen-maven-plugin</artifactId>
-                <version>${latest-version-from-maven-central}</version>
-                <executions>
-                    <execution>
+            <plugins>
+               <plugin>
+                  <groupId>io.github.ngbsn</groupId>
+                  <artifactId>sqlscript2jpa-codegen-maven-plugin</artifactId>
+                  <version>${latest-version-from-maven-central}</version>
+                  <executions>
+                     <execution>
                         <id>parse-schema</id>
-                        <phase>compile</phase>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>parse-schema</goal>
+                           <goal>parse-schema</goal>
                         </goals>
                         <configuration>
-                            <sqlFilePath>${basedir}/src/main/resources/sql/organization.sql</sqlFilePath>
-                            <packageName>org.mycompany.entities</packageName>
+                           <sqlFilePath>${basedir}/src/main/resources/sql/organization.sql</sqlFilePath>
+                           <packageName>org.mycompany.entities</packageName>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>build-helper-maven-plugin</artifactId>
+                  <version>3.2.0</version>
+                  <executions>
+                     <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                           <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                           <sources>
+                              <source>target/generated-sources/sqlscript2jpa/src/main/java/</source>
+                           </sources>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>   
+            </plugins>
+
 ```
 
 Also, you would need to add lombok to your dependencies:

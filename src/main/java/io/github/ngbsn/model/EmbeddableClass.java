@@ -3,7 +3,8 @@ package io.github.ngbsn.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -11,6 +12,6 @@ import java.util.Set;
 public class EmbeddableClass {
     private String fieldName;
     private String className;
-    private Set<Column> columns = new HashSet<>();
+    private List<Column> columns = new ArrayList<>();
     private boolean embeddedId;
 }
