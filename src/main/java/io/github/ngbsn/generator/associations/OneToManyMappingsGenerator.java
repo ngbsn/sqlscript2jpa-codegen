@@ -58,7 +58,7 @@ public class OneToManyMappingsGenerator {
         //Adding JoinColumn and MapsId annotations in below logic
         //Case: Composite Foreign key
         if (foreignKeyConstraint.getColumns().size() > 1) {
-            handleCompositeForeignKey(table, foreignKeyConstraint, parentTableField, embeddableId, allPrimaryKeyColumns);
+            handleCompositeForeignKey(table, parentTable, foreignKeyConstraint, parentTableField, embeddableId, allPrimaryKeyColumns);
 
         }
         //Case: Single Foreign Key
@@ -108,15 +108,15 @@ public class OneToManyMappingsGenerator {
                 .build().toString());
     }
 
-    private static void handleCompositeForeignKey(final Table table, final ForeignKeyConstraint foreignKeyConstraint, final Column parentTableField,
-                                                  final EmbeddableClass embeddableId, final List<Column> allPrimaryKeyColumns) {
+    private static void handleCompositeForeignKey(final Table table, final Table parentTable, final ForeignKeyConstraint foreignKeyConstraint,
+                                                  final Column parentTableField, final EmbeddableClass embeddableId, final List<Column> allPrimaryKeyColumns) {
         List<Column> listOfForeignKeyColumns = listOfForeignKeys(table, foreignKeyConstraint);
         //Case: Shared Composite Primary Key
         //If composite foreign key is inside the composite primary key, don't remove them from table.
         //This case assumes there is a primary composite key
         //Add a @MapsId annotation to the referenced table field
         if (embeddableId != null && new HashSet<>(allPrimaryKeyColumns).containsAll(listOfForeignKeyColumns)) {
-            handleSharedCompositePrimaryKey(table, parentTableField, embeddableId, listOfForeignKeyColumns);
+            handleCompositeForeignKeyInsideCompositePrimaryKey(table, parentTable, parentTableField, embeddableId, listOfForeignKeyColumns);
         } else {
             //Case1: There is no Composite primary key
             //TODO can part of Composite foreign key be a primary key. Is this applicable only to self referencing cases?
@@ -136,8 +136,8 @@ public class OneToManyMappingsGenerator {
         parentTableField.getAnnotations().add(JoinColumnsAnnotation.builder().joinColumns(joinColumns).build().toString());
     }
 
-    private static void handleSharedCompositePrimaryKey(final Table table, final Column parentTableField,
-                                                        final EmbeddableClass embeddableId, final List<Column> listOfForeignKeyColumns) {
+    private static void handleCompositeForeignKeyInsideCompositePrimaryKey(final Table table, final Table parentTable, final Column parentTableField,
+                                                                           final EmbeddableClass embeddableId, final List<Column> listOfForeignKeyColumns) {
 
         EmbeddableClass foreignCompositeKeyEmbedded = new EmbeddableClass(); //Create a new embeddable for this foreign composite key
         String embeddableName = listOfForeignKeyColumns.stream().map(Column::getFieldName).collect(Collectors.joining());

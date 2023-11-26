@@ -157,6 +157,7 @@ public class ModelGenerator {
                         table.getColumns().removeIf(column -> column.getColumnName().equals(alterExpression.getColumnName()));
 
                     } else if (alterExpression.getOperation().name().equals("ADD")){
+                        //TODO check why alterExpression.getColDataTypeList() is a list ?
                         String cName = alterExpression.getColDataTypeList().get(0) != null ? alterExpression.getColDataTypeList().get(0).getColumnName() : null;
                         String columnName = alterExpression.getColumnName() != null ? alterExpression.getColumnName() : cName;
                         String type = alterExpression.getColDataTypeList().get(0) != null ?

@@ -8,7 +8,7 @@ CREATE TABLE organization.contractors (
 );
 
 CREATE TABLE organization.employees (
-    emp_no      INT             NOT NULL,
+    emp_no      INT             NOT NULL  AUTO_INCREMENT,
     birth_date  DATE            NOT NULL,
     first_name  VARCHAR(14)     NOT NULL,
     last_name   VARCHAR(16)     NOT NULL,
@@ -18,14 +18,14 @@ CREATE TABLE organization.employees (
 );
 
 CREATE TABLE organization.departments (
-    dept_no     CHAR(4)         NOT NULL,
-    dept_name   VARCHAR(40)     NOT NULL,
+    dept_no     VARCHAR(100)         NOT NULL,
+    dept_name   VARCHAR(100)     NOT NULL,
     PRIMARY KEY (dept_no),
     UNIQUE   	(dept_name)
 );
 
 CREATE TABLE organization.dept_manager (
-   dept_no      CHAR(4)         NOT NULL,
+   dept_no      VARCHAR(100)         NOT NULL,
    emp_no       INT             NOT NULL,
    FOREIGN KEY (emp_no)  REFERENCES organization.employees (emp_no)    ON DELETE CASCADE,
    FOREIGN KEY (dept_no) REFERENCES organization.departments (dept_no) ON DELETE CASCADE,
@@ -36,7 +36,7 @@ CREATE INDEX dept_manager_dept_no_idx ON organization.dept_manager(dept_no);
 
 CREATE TABLE organization.dept_emp (
     emp_no      INT             NOT NULL,
-    dept_no     CHAR(4)         NOT NULL,
+    dept_no     VARCHAR(100)         NOT NULL,
     from_date   DATE            NOT NULL,
     to_date     DATE            NOT NULL,
     FOREIGN KEY (emp_no)  REFERENCES organization.employees   (emp_no)  ON DELETE CASCADE,
@@ -71,4 +71,12 @@ CREATE TABLE organization.contractors_salaries (
     salary          INT             NOT NULL,
     FOREIGN KEY (contractor_no, first_name) REFERENCES organization.contractors (contractor_no, first_name) ON DELETE CASCADE,
     PRIMARY KEY (contractor_no, first_name, salary)
+);
+
+CREATE TABLE organization.contractors_roles (
+    contractor_no   INT             NOT NULL,
+    first_name      VARCHAR(14)     NOT NULL,
+    role          VARCHAR(14)       NOT NULL,
+    FOREIGN KEY (contractor_no, first_name) REFERENCES organization.contractors (contractor_no, first_name) ON DELETE CASCADE,
+    PRIMARY KEY (contractor_no, first_name)
 );
