@@ -1,6 +1,6 @@
 package io.github.ngbsn.maven;
 
-import io.github.ngbsn.generator.ModelGenerator;
+import io.github.ngbsn.generator.models.ModelGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -13,7 +13,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import static io.github.ngbsn.generator.JPACodeGenerator.generateCode;
+import static io.github.ngbsn.generator.code.JPACodeGenerator.generateCode;
 
 
 //TODO write assertions

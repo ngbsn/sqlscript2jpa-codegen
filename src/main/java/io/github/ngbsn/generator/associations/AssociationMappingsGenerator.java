@@ -1,5 +1,6 @@
-package io.github.ngbsn.generator;
+package io.github.ngbsn.generator.associations;
 
+import io.github.ngbsn.generator.models.ModelGenerator;
 import io.github.ngbsn.model.Column;
 import io.github.ngbsn.model.ForeignKeyConstraint;
 import io.github.ngbsn.model.Table;
@@ -9,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.github.ngbsn.generator.OneToManyMappingsGenerator.addBiDirectionalMappings;
+import static io.github.ngbsn.generator.associations.OneToManyMappingsGenerator.addBiDirectionalMappings;
 
 /**
  * Generate both UniDirectional and BiDirectional association mappings for all tables
  */
-class AssociationMappingsGenerator {
+public class AssociationMappingsGenerator {
 
 
     private AssociationMappingsGenerator() {
@@ -23,7 +24,7 @@ class AssociationMappingsGenerator {
     /**
      * Generate both UniDirectional and BiDirectional association mappings for all tables
      */
-    static void generateMappings() {
+    public static void generateMappings() {
         Iterator<Map.Entry<String, Table>> it = ModelGenerator.getTablesMap().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Table> item = it.next();

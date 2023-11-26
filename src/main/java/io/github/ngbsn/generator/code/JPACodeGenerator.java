@@ -1,4 +1,4 @@
-package io.github.ngbsn.generator;
+package io.github.ngbsn.generator.code;
 
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
@@ -6,6 +6,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import io.github.ngbsn.exception.SQLParsingException;
+import io.github.ngbsn.generator.models.ModelGenerator;
 import io.github.ngbsn.model.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -102,6 +103,8 @@ public class JPACodeGenerator {
             imports.add("lombok.Getter");
             imports.add("lombok.Setter");
             imports.add("lombok.Builder");
+            imports.add("lombok.NoArgsConstructor");
+            imports.add("lombok.AllArgsConstructor");
             root.put("imports", imports);
 
             /* Merge data-model with template */

@@ -1,6 +1,7 @@
-package io.github.ngbsn.generator;
+package io.github.ngbsn.generator.models;
 
 import io.github.ngbsn.exception.SQLParsingException;
+import io.github.ngbsn.generator.associations.AssociationMappingsGenerator;
 import io.github.ngbsn.model.*;
 import io.github.ngbsn.model.annotations.entity.EntityAnnotation;
 import io.github.ngbsn.model.annotations.entity.TableAnnotation;
@@ -59,7 +60,7 @@ public class ModelGenerator {
      * @param sqlScript The input DDL commands used for generating the models
      * @return List of Tables models
      */
-    static List<Table> parse(final String sqlScript) throws SQLParsingException {
+    public static List<Table> parse(final String sqlScript) throws SQLParsingException {
         String extractedStatementWithoutDefaultConstraint = null;
         try {
             String[] extractedStatementsArray = sqlScript.split(";");
@@ -152,6 +153,32 @@ public class ModelGenerator {
                     } else if (alterExpression.getIndex() != null && alterExpression.getIndex().getType().equals("PRIMARY KEY")) {
                         //case: ALTER TABLE PRIMARY KEY
                         extractPrimaryKeys(alterExpression.getIndex(), table);
+                    } else if (alterExpression.getOperation().name().equals("DROP")){
+                        table.getColumns().removeIf(column -> column.getColumnName().equals(alterExpression.getColumnName()));
+
+                    } else if (alterExpression.getOperation().name().equals("ADD")){
+                        String cName = alterExpression.getColDataTypeList().get(0) != null ? alterExpression.getColDataTypeList().get(0).getColumnName() : null;
+                        String columnName = alterExpression.getColumnName() != null ? alterExpression.getColumnName() : cName;
+                        String type = alterExpression.getColDataTypeList().get(0) != null ?
+                                SQLTypeToJpaTypeMapping.getTypeMapping(alterExpression.getColDataTypeList().get(0).getColDataType().getDataType()) : null;
+                        Column column = new Column();
+                        column.setColumnName(columnName);
+                        column.setType(type);
+                        String fieldName = Util.convertSnakeCaseToCamelCase(column.getColumnName(), false);
+                        fieldName = SourceVersion.isKeyword(fieldName) ? fieldName + table.getClassName() : fieldName;
+                        column.setFieldName(fieldName);
+
+                        //Check for NOT NULL
+                        if (alterExpression.getColDataTypeList().get(0) != null && alterExpression.getColDataTypeList().get(0).getColumnSpecs() != null) {
+                            List<String> fieldAnnotations = new ArrayList<>();
+
+                            String constraints = String.join(" ", alterExpression.getColDataTypeList().get(0).getColumnSpecs());
+                            if (constraints.contains("NOT NULL")) {
+                                fieldAnnotations.add(NotNullAnnotation.builder().build().toString());
+                            }
+                            column.setAnnotations(fieldAnnotations);
+                        }
+                        table.getColumns().add(column);
                     }
                 });
                 extractForeignKeys(foreignKeyIndexes, table);

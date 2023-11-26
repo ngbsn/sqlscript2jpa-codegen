@@ -1,5 +1,6 @@
-package io.github.ngbsn.generator;
+package io.github.ngbsn.generator.associations;
 
+import io.github.ngbsn.generator.models.ModelGenerator;
 import io.github.ngbsn.model.Column;
 import io.github.ngbsn.model.EmbeddableClass;
 import io.github.ngbsn.model.ForeignKeyConstraint;
@@ -30,7 +31,7 @@ public class OneToManyMappingsGenerator {
      * @param table                Table model
      * @param foreignKeyConstraint ForeignKeyConstraint model
      */
-    static void addBiDirectionalMappings(final Table table, final ForeignKeyConstraint foreignKeyConstraint) {
+    public static void addBiDirectionalMappings(final Table table, final ForeignKeyConstraint foreignKeyConstraint) {
         Table parentTable = ModelGenerator.getTablesMap().get(foreignKeyConstraint.getReferencedTableName().replaceAll("[\"']", ""));
 
         //In the Child table, create a new column having field name as Parent(Referenced) Table, with @ManyTOne annotation
@@ -72,33 +73,33 @@ public class OneToManyMappingsGenerator {
         //Get the foreign key column from the table.
         List<Column> listOfForeignKeyColumns = listOfForeignKeys(table, foreignKeyConstraint);
         Column foreignKeyColumn = !listOfForeignKeyColumns.isEmpty() ? listOfForeignKeyColumns.get(0) : null;
+        if(foreignKeyColumn == null) throw new UnsupportedOperationException(); //some issue in the SQL
 
-        if (foreignKeyColumn != null) {
-            //Check if foreign key is also a primary key, by iterating through the primary key list
-            Optional<Column> optionalColumnPrimaryForeign = allPrimaryKeyColumns.stream()
-                    .filter(column -> column.getColumnName() != null && column.getColumnName().equals(foreignKeyColumn.getColumnName())).findFirst();
-            optionalColumnPrimaryForeign.ifPresentOrElse(column -> {
-                        //Case: Shared Primary key
-                        //If foreign key is a primary key, don't remove it from table. Set SharedPrimaryKey as true
-                        column.setSharedPrimaryKey(true);
+        //Case: Shared Single Primary Key
+        //Check if foreign key is also a primary key, by iterating through the primary key list
+        Optional<Column> optionalColumnPrimaryForeign = allPrimaryKeyColumns.stream()
+                .filter(column -> column.getColumnName() != null && column.getColumnName().equals(foreignKeyColumn.getColumnName())).findFirst();
+        optionalColumnPrimaryForeign.ifPresentOrElse(column -> {
+                    //Case: Shared Primary key
+                    //If foreign key is a primary key, don't remove it from table. Set SharedPrimaryKey as true
+                    column.setSharedPrimaryKey(true);
+                    //Add a @MapsId annotation to the referenced table field
+                    parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(column.getFieldName()).build().toString());
 
-                        //Remove existing column annotations and add again with updatable=false, insertable=false
-                        //This is necessary as the column is inserted/updated through foreign key
-                        column.getAnnotations().removeIf(s -> s.contains("@Column"));
-                        column.getAnnotations().add(ColumnAnnotation.builder()
-                                        .columnName(column.getColumnName())
-                                        .updatable(false)
-                                        .insertable(false)
-                                        .build().toString());
+                    //Remove existing column annotations and add again with updatable=false, insertable=false
+                    //This is necessary as the column is inserted/updated through foreign key
+                    column.getAnnotations().removeIf(s -> s.contains("@Column"));
+                    column.getAnnotations().add(ColumnAnnotation.builder()
+                            .columnName(column.getColumnName())
+                            .updatable(false)
+                            .insertable(false)
+                            .build().toString());
 
-                        //Add a @MapsId annotation to the referenced table field
-                        parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(column.getFieldName()).build().toString());
-                    }
-                    , () ->
-                            //If foreign key is not a primary key, then remove it from the table
-                            table.getColumns().remove(foreignKeyColumn)
-            );
-        }
+                }
+                , () ->
+                        //If foreign key is not a primary key, then remove it from the table
+                        table.getColumns().remove(foreignKeyColumn)
+        );
 
         //Add a @JoinColumn annotation for the referenced table field
         parentTableField.getAnnotations().add(JoinColumnAnnotation.builder()
@@ -118,6 +119,7 @@ public class OneToManyMappingsGenerator {
             handleSharedCompositePrimaryKey(table, parentTableField, embeddableId, listOfForeignKeyColumns);
         } else {
             //Case1: There is no Composite primary key
+            //TODO can part of Composite foreign key be a primary key. Is this applicable only to self referencing cases?
             //Case2: If composite foreign key is not inside the composite primary key, then remove it from the table
             listOfForeignKeyColumns.forEach(column -> table.getColumns().remove(column));
         }

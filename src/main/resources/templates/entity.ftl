@@ -6,6 +6,8 @@ import ${import};
 
 // Generated source code
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Builder
@@ -28,6 +30,8 @@ public class ${table.className}{
 
 <#if (table.numOfPrimaryKeyColumns > 1) >
     <#list table.embeddableClasses as embeddableClass>
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Getter
     @Setter
     @Builder
@@ -44,6 +48,8 @@ public class ${table.className}{
     </#list>
 
     <#if table.embeddedId??>
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Getter
     @Setter
     @Builder
@@ -74,8 +80,8 @@ public class ${table.className}{
     <#list table.columns as column>
     <#if column.primaryKey == true>
     @Id
-    <#if column.sharedPrimaryKey == false>
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    <#if column.sharedPrimaryKey == false && (column.type == "Integer" || column.type == "Short" || column.type == "Long") >
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     </#if>
     </#if>
     <#list column.annotations as annotation>

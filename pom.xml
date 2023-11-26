@@ -181,7 +181,7 @@
                     </descriptors>
                     <archive>
                         <manifest>
-                            <mainClass>io.github.ngbsn.generator.JPACodeGenerator</mainClass>
+                            <mainClass>io.github.ngbsn.generator.code.JPACodeGenerator</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

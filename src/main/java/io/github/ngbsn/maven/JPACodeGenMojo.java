@@ -1,6 +1,6 @@
 package io.github.ngbsn.maven;
 
-import io.github.ngbsn.generator.JPACodeGenerator;
+import io.github.ngbsn.generator.code.JPACodeGenerator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.maven.plugin.AbstractMojo;

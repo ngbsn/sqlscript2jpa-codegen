@@ -1,5 +1,6 @@
-package io.github.ngbsn.generator;
+package io.github.ngbsn.generator.associations;
 
+import io.github.ngbsn.generator.models.ModelGenerator;
 import io.github.ngbsn.model.Column;
 import io.github.ngbsn.model.ForeignKeyConstraint;
 import io.github.ngbsn.model.Table;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * Generate BiDirectional Mappings (many-to-many) for a specific table
  */
-class ManyToManyMappingsGenerator {
+public class ManyToManyMappingsGenerator {
 
     private ManyToManyMappingsGenerator() {
     }
@@ -25,7 +26,7 @@ class ManyToManyMappingsGenerator {
      * @param table                    The table to be processed
      * @param foreignKeyConstraintList List of generated foreignKeyConstraintList models
      */
-    static void addManyToManyMappings(final Table table, final List<ForeignKeyConstraint> foreignKeyConstraintList) {
+    public static void addManyToManyMappings(final Table table, final List<ForeignKeyConstraint> foreignKeyConstraintList) {
         Table table1 = ModelGenerator.getTablesMap().get(foreignKeyConstraintList.get(0).getReferencedTableName().replaceAll("[\"']", ""));
         Table table2 = ModelGenerator.getTablesMap().get(foreignKeyConstraintList.get(1).getReferencedTableName().replaceAll("[\"']", ""));
 
