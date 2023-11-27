@@ -7,13 +7,11 @@ import io.github.ngbsn.model.ForeignKeyConstraint;
 import io.github.ngbsn.model.Table;
 import io.github.ngbsn.model.annotations.field.*;
 import io.github.ngbsn.util.Util;
-import org.apache.commons.text.WordUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -111,12 +109,19 @@ public class OneToManyMappingsGenerator {
     private static void handleCompositeForeignKey(final Table table, final Table parentTable, final ForeignKeyConstraint foreignKeyConstraint,
                                                   final Column parentTableField, final EmbeddableClass embeddableId, final List<Column> allPrimaryKeyColumns) {
         List<Column> listOfForeignKeyColumns = listOfForeignKeys(table, foreignKeyConstraint);
-        //Case: Shared Composite Primary Key
-        //If composite foreign key is inside the composite primary key, don't remove them from table.
-        //This case assumes there is a primary composite key
-        //Add a @MapsId annotation to the referenced table field
-        if (embeddableId != null && new HashSet<>(allPrimaryKeyColumns).containsAll(listOfForeignKeyColumns)) {
-            handleCompositeForeignKeyInsideCompositePrimaryKey(table, parentTable, parentTableField, embeddableId, listOfForeignKeyColumns);
+        if(embeddableId != null && new HashSet<>(allPrimaryKeyColumns).equals(new HashSet<>(listOfForeignKeyColumns))){
+            //Case: Shared Composite Primary Key
+            //This case assumes there is a primary composite key
+            //If composite foreign key has same columns as composite primary key, don't remove them from table.
+            //Add a @MapsId annotation to the referenced table field
+            handleCompositeForeignKeySameAsCompositePrimaryKey(table, parentTable, parentTableField);
+        }
+        else if (embeddableId != null && new HashSet<>(allPrimaryKeyColumns).containsAll(listOfForeignKeyColumns)) {
+            //Case: Shared Composite Primary Key
+            //This case assumes there is a primary composite key
+            //If composite foreign key is inside the composite primary key, don't remove them from table.
+            //Add a @MapsId annotation to the referenced table field
+            handleCompositeForeignKeyInsideCompositePrimaryKey(parentTable, parentTableField, embeddableId, listOfForeignKeyColumns);
         } else {
             //Case1: There is no Composite primary key
             //TODO can part of Composite foreign key be a primary key. Is this applicable only to self referencing cases?
@@ -136,37 +141,39 @@ public class OneToManyMappingsGenerator {
         parentTableField.getAnnotations().add(JoinColumnsAnnotation.builder().joinColumns(joinColumns).build().toString());
     }
 
-    private static void handleCompositeForeignKeyInsideCompositePrimaryKey(final Table table, final Table parentTable, final Column parentTableField,
-                                                                           final EmbeddableClass embeddableId, final List<Column> listOfForeignKeyColumns) {
+    private static void handleCompositeForeignKeySameAsCompositePrimaryKey(final Table table, final Table parentTable, final Column parentTableField) {
+        //Reuse the parent table embeddedId class to create a field for the shared primary key
+        EmbeddableClass parentEmbeddedId = parentTable.getEmbeddedId();
+        Column parentEmbeddedIdColumn = new Column();
+        parentEmbeddedIdColumn.setType(parentTable.getClassName() + "." + parentEmbeddedId.getClassName());
+        parentEmbeddedIdColumn.setFieldName(parentEmbeddedId.getFieldName());
+        parentEmbeddedIdColumn.setEmbeddedId(true);
+        table.getColumns().add(parentEmbeddedIdColumn);
+        //Remove EmbeddedID from child table
+        table.setEmbeddedId(null);
 
-        EmbeddableClass foreignCompositeKeyEmbedded = new EmbeddableClass(); //Create a new embeddable for this foreign composite key
-        String embeddableName = listOfForeignKeyColumns.stream().map(Column::getFieldName).collect(Collectors.joining());
-        foreignCompositeKeyEmbedded.setClassName(WordUtils.capitalize(embeddableName));
-        foreignCompositeKeyEmbedded.setFieldName(embeddableName);
-        table.getEmbeddableClasses().add(foreignCompositeKeyEmbedded); //add new embeddable to the Table list of Embeddables
-        listOfForeignKeyColumns.forEach(column -> {
-            //Remove existing column annotations and add again with updatable=false, insertable=false.
-            //This is necessary as the column is inserted/updated through foreign key
-            column.getAnnotations().removeIf(s -> s.contains("@Column"));
-            column.getAnnotations().add(ColumnAnnotation.builder()
-                    .columnName(column.getColumnName())
-                    .updatable(false)
-                    .insertable(false)
-                    .build().toString());
-
-            //add the individual foreign keys columns to the newly created embeddable
-            foreignCompositeKeyEmbedded.getColumns().add(column);
-            //Remove the individual foreign keys from EmbeddedId and add the newly created embeddable into EmbeddedId
-            embeddableId.getColumns().remove(column);
-        });
-        Column foreignCompositeField = new Column();
-        foreignCompositeField.setType(foreignCompositeKeyEmbedded.getClassName());
-        foreignCompositeField.setFieldName(foreignCompositeKeyEmbedded.getFieldName());
-        embeddableId.getColumns().add(foreignCompositeField);
-
-        if (embeddableId.getFieldName() != null)
-            parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(foreignCompositeField.getFieldName()).build().toString());
+        //Add @MapsId annotation, as the shared primary key is not set explicitly in this table, rather managed through parent primary key
+        parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(parentEmbeddedIdColumn.getFieldName()).build().toString());
     }
+
+    private static void handleCompositeForeignKeyInsideCompositePrimaryKey(final Table parentTable, final Column parentTableField,
+                                                                           final EmbeddableClass embeddableId, final List<Column> listOfForeignKeyColumns) {
+        //remove all foreign key columns as they are tracked by the EmbeddedID field of parent
+        listOfForeignKeyColumns.forEach(column ->
+                embeddableId.getColumns().remove(column)
+        );
+
+        //Reuse the parent table embeddedId class to create a field for the shared primary key
+        EmbeddableClass parentEmbeddedId = parentTable.getEmbeddedId();
+        Column parentEmbeddedIdColumn = new Column();
+        parentEmbeddedIdColumn.setType(parentTable.getClassName() + "." + parentEmbeddedId.getClassName());
+        parentEmbeddedIdColumn.setFieldName(parentEmbeddedId.getFieldName());
+        embeddableId.getColumns().add(parentEmbeddedIdColumn);
+
+        //Add @MapsId annotation, as the shared primary key is not set explicitly in this table, rather managed through parent primary key
+        parentTableField.getAnnotations().add(MapsIdAnnotation.builder().fieldName(parentEmbeddedIdColumn.getFieldName()).build().toString());
+    }
+
 
     /**
      * Convert column names in foreignKeyConstraint to List of Column models

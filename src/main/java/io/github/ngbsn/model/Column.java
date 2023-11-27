@@ -15,5 +15,6 @@ public class Column {
     private String type;
     private boolean primaryKey;
     private boolean sharedPrimaryKey;
+    private boolean embeddedId;
     private List<String> annotations = new ArrayList<>();
 }

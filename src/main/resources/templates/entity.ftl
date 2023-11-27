@@ -28,25 +28,8 @@ public class ${table.className}{
     }
     </#list>
 
+<#-- Case: Composite Primary Key -->
 <#if (table.numOfPrimaryKeyColumns > 1) >
-    <#list table.embeddableClasses as embeddableClass>
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Getter
-    @Setter
-    @Builder
-    @Embeddable
-    public static class ${embeddableClass.className} implements Serializable{
-        <#list embeddableClass.columns as column>
-        <#list column.annotations as annotation>
-        ${annotation}
-        </#list>
-        private ${column.type} ${column.fieldName};
-
-        </#list>
-    }
-    </#list>
-
     <#if table.embeddedId??>
     @NoArgsConstructor
     @AllArgsConstructor
@@ -68,10 +51,15 @@ public class ${table.className}{
     </#if>
 
     <#list table.columns as column>
-    <#if column.primaryKey == false>
+    <#if column.primaryKey == false && column.embeddedId == false>
     <#list column.annotations as annotation>
     ${annotation}
     </#list>
+    private ${column.type} ${column.fieldName};
+    </#if>
+    <#-- This is for shared primary key usecase -->
+    <#if column.embeddedId == true>
+    @EmbeddedId
     private ${column.type} ${column.fieldName};
     </#if>
 
@@ -80,6 +68,7 @@ public class ${table.className}{
     <#list table.columns as column>
     <#if column.primaryKey == true>
     @Id
+     <#-- If foreign key is primary key, then no need for ID generation in this table, its handled by referenced table -->
     <#if column.sharedPrimaryKey == false && (column.type == "Integer" || column.type == "Short" || column.type == "Long") >
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     </#if>
