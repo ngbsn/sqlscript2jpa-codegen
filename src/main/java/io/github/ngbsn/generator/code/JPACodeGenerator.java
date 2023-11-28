@@ -45,6 +45,7 @@ public class JPACodeGenerator {
      */
     public static void generateCode(final String sqlScript, final String packageName) throws IOException, TemplateException, SQLParsingException {
         logger.debug("sql script {}", sqlScript);
+        ModelGenerator.clearTablesMap();
         List<Table> tables = generateModels(sqlScript);
         processTemplate(tables, packageName);
     }
