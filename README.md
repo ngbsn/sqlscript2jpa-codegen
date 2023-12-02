@@ -1,6 +1,6 @@
 # sqlscript2jpa-codegen
 
-A Java tool to generate Lombok wired JPA entities from DDL statements. The library offers both a maven plugin and a
+A Java tool to generate Lombok wired JPA entities from DDL statements. The tool offers both a maven plugin library and a
 JAR to be run as a standalone tool. It internally uses JSqlParser to parse the DDL statements.
 
 The tool can generate the following, 
