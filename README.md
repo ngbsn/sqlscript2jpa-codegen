@@ -1,7 +1,15 @@
 # sqlscript2jpa-codegen
 
-A Java library to generate Lombok wired JPA entities from DDL statements. The library offers both a maven plugin and a
+A Java tool to generate Lombok wired JPA entities from DDL statements. The library offers both a maven plugin and a
 jar to be run as a standalone tool. It internally uses JSqlParser to parse the DDL statements.
+
+The tool can generate the following, 
+- Entities for all tables having annotations @Table and @Column for table and column names respectively.
+- @OneToMany, @ManyToMany, @JoinColumn annotations for association mappings. 
+- @Embeddable and @EmbeddedId for composite keys. 
+- @MapsId for shared primary keys. 
+- javax validation annotation @NotNull for the SQL NOT NULL Constraint.
+and much more!
 
 ### Getting Started
 
@@ -14,6 +22,9 @@ jar to be run as a standalone tool. It internally uses JSqlParser to parse the D
     * CREATE TABLE
     * ALTER TABLE ADD CONSTRAINT PRIMARY KEY
     * ALTER TABLE ADD CONSTRAINT FOREIGN KEY
+    * ALTER TABLE ADD COLUMN
+    * ALTER TABLE DROP COLUMN
+5. Not all SQL Types are supported. Unsupported types get generated as Java Type **Object**.
 
 ## Maven
 
@@ -84,10 +95,10 @@ By default, the source code will be generated under `target/generated-sources/sq
 ## Standalone
 
 Get the jar
-from https://repo1.maven.org/maven2/io/github/ngbsn/sqlscript2jpa-codegen-maven-plugin/1.0.5/sqlscript2jpa-codegen-maven-plugin-1.0.5-standalone.jar
+from https://repo1.maven.org/maven2/io/github/ngbsn/sqlscript2jpa-codegen-maven-plugin/1.0.5/sqlscript2jpa-codegen-maven-plugin-1.0.6-standalone.jar
 
 ```
-java -jar sqlscript2jpa-codegen-maven-plugin-1.0.5-standalone.jar "<sql_file_path>" "<package_name>"
+java -jar sqlscript2jpa-codegen-maven-plugin-1.0.6-standalone.jar "<sql_file_path>" "<package_name>"
 ```
 
 This will generate the JPA entities in a folder structure as defined by the package name
