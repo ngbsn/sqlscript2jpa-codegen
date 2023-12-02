@@ -9,6 +9,7 @@ The tool can generate the following,
 - @Embeddable and @EmbeddedId for composite keys. 
 - @MapsId for shared primary keys. 
 - javax validation annotation @NotNull for the SQL NOT NULL Constraint.
+
 and much more!
 
 ### Getting Started
