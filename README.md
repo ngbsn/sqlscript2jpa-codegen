@@ -4,7 +4,7 @@ A Java tool to generate Lombok wired JPA entities from DDL statements. The libra
 jar to be run as a standalone tool. It internally uses JSqlParser to parse the DDL statements.
 
 The tool can generate the following, 
-- Entities for all tables having annotations @Table and @Column for table and column names respectively.
+- Entities for all tables with annotations @Table and @Column for table and column names respectively.
 - @OneToMany, @ManyToMany, @JoinColumn annotations for association mappings. 
 - @Embeddable and @EmbeddedId for composite keys. 
 - @MapsId for shared primary keys. 
@@ -17,7 +17,7 @@ and much more!
 
 1. The SQL file should contain only SQL statements
 2. All SQL statements should terminate with a semicolon(;)
-3. Presence of other intructions such as PL/SQL blocks may get ignored if properly terminated with semicolons.
+3. Presence of other instructions such as PL/SQL blocks may get ignored if properly terminated with semicolons.
 4. Supported DDL statements are:
     * CREATE TABLE
     * ALTER TABLE ADD CONSTRAINT PRIMARY KEY
